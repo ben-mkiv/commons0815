@@ -1,0 +1,94 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+// java version
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+def simpleVersion = "1.0.0"
+
+def opencomputers_version = "MC1.12.2-1.7.2.67"
+
+group= "ben_mkiv.commons0815"
+archivesBaseName = "Commons0815-MC1.12.2"
+version = simpleVersion
+
+minecraft {
+    replaceIn "ben_mkiv/rendertoolkit/renderToolkit.java"
+    replace "@VERSION@", simpleVersion
+
+    replaceIn "ben_mkiv/guitoolkit/guiToolkit.java"
+    replace "@VERSION@", simpleVersion
+
+    runDir = "run"
+    version = "14.23.1.2555"
+    mappings = "snapshot_20171106"
+}
+
+runClient {
+    jvmArgs '-Dfml.coreMods.load=li.cil.oc.common.launch.TransformerLoader'
+}
+
+runServer {
+    jvmArgs '-Dfml.coreMods.load=li.cil.oc.common.launch.TransformerLoader'
+}
+
+repositories {
+    maven {
+        name = "opencomputers"
+        url = "http://maven.cil.li/"
+    }
+}
+
+dependencies {
+    provided  "li.cil.oc:OpenComputers:${opencomputers_version}"
+}
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.entityInfo, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+
+    // copy everything else, thats not the mcmod.entityInfo
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+
+    // handle access transformers (https://tutorials.darkhax.net/tutorials/access_transformers/)
+    rename '(.+_at.cfg)', 'META-INF/$1'
+}
+
+task devJar(type: Jar) {
+    from sourceSets.main.output
+    from sourceSets.main.allJava
+    classifier = 'dev'
+}
+
+artifacts {
+    archives devJar
+}
+
+
