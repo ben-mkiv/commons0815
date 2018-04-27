@@ -1,0 +1,31 @@
+{
+  "modListVersion": 2,
+  "modList": [
+    {
+      "modid": "rendertoolkit",
+      "name": "renderToolkit",
+      "description": "dependency of OpenEntity/OpenGlasses/UrbanMechs",
+      "version": "${version}",
+      "mcversion": "${mcversion}",
+      "url": "https://github.com/ben-mkiv/renderToolkit",
+      "updateUrl": "",
+      "authorList": ["ben-mkiv"],
+      "credits": "",
+      "logoFile": "",
+      "screenshots": [],
+      "dependencies": []
+    },{
+      "modid": "guitoolkit",
+      "name": "guiToolkit",
+      "description": "dependency of OpenEntity/OpenGlasses/UrbanMechs",
+      "version": "${version}",
+      "mcversion": "${mcversion}",
+      "url": "https://github.com/ben-mkiv/guiToolkit",
+      "updateUrl": "",
+      "authorList": ["ben-mkiv"],
+      "credits": "",
+      "logoFile": "",
+      "screenshots": [],
+      "dependencies": []
+    }
+  ]}
