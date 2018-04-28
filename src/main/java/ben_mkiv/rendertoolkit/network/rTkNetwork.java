@@ -21,17 +21,18 @@ public class rTkNetwork {
 
     public static SimpleNetworkWrapper channel;
 //
+    static int id = -1;
+
     public static void init(){
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(renderToolkit.MODID.toLowerCase());
-        int id=-1;
 
-        channel.registerMessage(ClientEventPacket.Handler.class, ClientEventPacket.class, id++, Side.SERVER);
+        registerMessage(ClientEventPacket.Handler.class, ClientEventPacket.class, Side.SERVER);
+        registerMessage(ClientRequest.Handler.class, ClientRequest.class, Side.CLIENT);
+        registerMessage(WidgetUpdatePacket.Handler.class, WidgetUpdatePacket.class, Side.CLIENT);
+    }
 
-        channel.registerMessage(ClientRequest.Handler.class, ClientRequest.class, id++, Side.CLIENT);
-
-        channel.registerMessage(WidgetUpdatePacket.Handler.class, WidgetUpdatePacket.class, id++, Side.CLIENT);
-
-
+    public static void registerMessage(Class handler, Class clazz, Side side){
+        channel.registerMessage(handler, clazz, id++, side);
     }
 
     public static void sendToTrackingPlayers(IMessage msg, Entity entity){

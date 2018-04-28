@@ -11,6 +11,9 @@ import ben_mkiv.rendertoolkit.client.event.ClientEventHandler;
 import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.Widget;
 
+import ben_mkiv.rendertoolkit.network.EventType;
+import ben_mkiv.rendertoolkit.network.messages.ClientEventPacket;
+import ben_mkiv.rendertoolkit.network.rTkNetwork;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
@@ -32,7 +35,7 @@ public class ClientRenderer {
 	public Map<Integer, IRenderableWidget> renderablesWorld = new ConcurrentHashMap<Integer, IRenderableWidget>();
 
 	public static ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
-	public static ArrayList<Float> renderResolution = null;
+	public static Vec3d renderResolution = null;
 
 	//gets the current widgets and puts them to the correct hashmap
 	public void updateWidgets(Set<Entry<Integer, Widget>> widgets){
@@ -78,8 +81,7 @@ public class ClientRenderer {
 	}
 
 	public void sendResolution(){
-		//TODO: FIX
-		//NetworkRegistry.packetHandler.sendToServer(new GlassesEventPacket(GlassesEventPacket.EventType.GLASSES_SCREEN_SIZE, getRenderOffset(), Minecraft.getMinecraft().player, ClientRenderer.resolution.getScaledWidth(), ClientRenderer.resolution.getScaledHeight(), ClientRenderer.resolution.getScaleFactor()));
+		rTkNetwork.channel.sendToServer(new ClientEventPacket(EventType.GLASSES_SCREEN_SIZE, getRenderOffset()));
 	}
 
 	public boolean shouldWidgetBeRendered(EntityPlayer player, IRenderableWidget widget){
@@ -111,7 +113,7 @@ public class ClientRenderer {
 		GL11.glDepthMask(false);
 
 		if(renderResolution != null) {
-			GL11.glScalef(ClientRenderer.resolution.getScaledWidth() / renderResolution.get(0), ClientRenderer.resolution.getScaledHeight() / renderResolution.get(1), 1);
+			GL11.glScaled(ClientRenderer.resolution.getScaledWidth() / renderResolution.x, ClientRenderer.resolution.getScaledHeight() / renderResolution.y, 1);
 		}
 		for(IRenderableWidget renderable : renderables.values()){
 			if(shouldWidgetBeRendered(player, renderable)){

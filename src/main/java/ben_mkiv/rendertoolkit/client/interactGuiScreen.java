@@ -4,7 +4,7 @@ import ben_mkiv.rendertoolkit.client.event.ClientEventHandler;
 import ben_mkiv.rendertoolkit.network.EventType;
 import ben_mkiv.rendertoolkit.network.messages.ClientEventPacket;
 import ben_mkiv.rendertoolkit.network.rTkNetwork;
-import ben_mkiv.rendertoolkit.renderToolkit;
+import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Keyboard;
@@ -22,9 +22,9 @@ public class interactGuiScreen extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        if(renderToolkit.ClientSurface.instances.renderResolution != null){
-            mouseX*=(renderToolkit.ClientSurface.instances.renderResolution.get(0) / renderToolkit.ClientSurface.instances.resolution.getScaledWidth());
-            mouseY*=(renderToolkit.ClientSurface.instances.renderResolution.get(1) / renderToolkit.ClientSurface.instances.resolution.getScaledHeight());
+        if(ClientSurface.renderResolution != null){
+            mouseX*=(ClientSurface.renderResolution.x / ClientSurface.resolution.getScaledWidth());
+            mouseY*=(ClientSurface.renderResolution.y / ClientSurface.resolution.getScaledHeight());
         }
 
         rTkNetwork.channel.sendToServer(new ClientEventPacket(EventType.INTERACT_OVERLAY, mc.player, new Vec3d(mouseX, mouseY, 0), mouseButton));

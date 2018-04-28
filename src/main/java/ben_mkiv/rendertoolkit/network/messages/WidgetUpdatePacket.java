@@ -1,29 +1,22 @@
 package ben_mkiv.rendertoolkit.network.messages;
 
 import ben_mkiv.rendertoolkit.common.widgets.Widget;
-import ben_mkiv.rendertoolkit.renderToolkit;
+import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.io.IOException;
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class WidgetUpdatePacket  implements IMessage {
-    public enum Action{
-        AddWigets,RemoveWidgets,RemoveAllWidgets;
-    }
+    public enum Action { AddWigets, RemoveWidgets, RemoveAllWidgets }
 
     public HashMap<Integer, Widget> widgetList;
     List<Integer> ids;
@@ -49,8 +42,9 @@ public class WidgetUpdatePacket  implements IMessage {
         type = Action.RemoveWidgets;
     }
 
-    public WidgetUpdatePacket(int id, Widget widget) {
-        this.widgetList = new HashMap<Integer,Widget>();
+
+    public WidgetUpdatePacket(int id, @Nonnull Widget widget) {
+        this.widgetList = new HashMap<>();
         widgetList.put(id, widget);
         this.type = Action.AddWigets;
     }
@@ -58,13 +52,22 @@ public class WidgetUpdatePacket  implements IMessage {
     @Override
     public void fromBytes(ByteBuf buf) {
         type = Action.values()[buf.readInt()];
+
         switch (type) {
-            case AddWigets: readOnAddAction(buf);
+            case AddWigets:
+                widgetList = new HashMap<>();
+                for(int size = buf.readInt(), i = 0; i < size; i++){
+                    Widget w = Widget.create(buf.readInt());
+                    w.read(buf);
+                    widgetList.put(buf.readInt(), w);
+                }
                 break;
-            case RemoveWidgets: readOnRemoveAction(buf);
+            case RemoveWidgets:
+                ids = new ArrayList<>();
+                for(int size = buf.readInt(), i = 0; i < size; i++)
+                    ids.add(buf.readInt());
                 break;
-            case RemoveAllWidgets: ;
-                break;
+            case RemoveAllWidgets:
             default:
                 break;
 
@@ -75,52 +78,25 @@ public class WidgetUpdatePacket  implements IMessage {
     public void toBytes(ByteBuf buf) {
         buf.writeInt(type.ordinal());
         switch (type) {
-            case AddWigets: writeOnAddAction(buf);
+            case AddWigets:
+                buf.writeInt(widgetList.size());
+                for(Map.Entry<Integer, Widget> w : widgetList.entrySet()){
+                    buf.writeInt(w.getValue().getType());
+                    w.getValue().write(buf);
+                    buf.writeInt(w.getKey());
+                }
                 break;
-            case RemoveWidgets: writeOnRemoveAction(buf);
+            case RemoveWidgets:
+                buf.writeInt(ids.size());
+                for(Integer id : ids)
+                    buf.writeInt(id);
                 break;
-            case RemoveAllWidgets: ;
-                break;
+            case RemoveAllWidgets:
             default:
                 break;
 
         }
     }
-
-    private void readOnAddAction(ByteBuf buf) {
-        widgetList = new HashMap<Integer,Widget>();
-        int size = buf.readInt();
-        for(int i=0; i<size ;i++){
-            Widget w = Widget.create(buf.readInt());
-            w.read(buf);
-            widgetList.put(buf.readInt(), w);
-        }
-    }
-
-    private void readOnRemoveAction(ByteBuf buf){
-        ids = new ArrayList<Integer>();
-        int size = buf.readInt();
-        for(int i = 0; i<size; i++){
-            ids.add(buf.readInt());
-        }
-    }
-
-    private void writeOnAddAction(ByteBuf buf) {
-        buf.writeInt(widgetList.size());
-        for(Map.Entry<Integer, Widget> w : widgetList.entrySet()){
-            buf.writeInt(w.getValue().getType());
-            w.getValue().write(buf);
-            buf.writeInt(w.getKey());
-        }
-    }
-
-    private void writeOnRemoveAction(ByteBuf buf) {
-        buf.writeInt(ids.size());
-        for(Integer i: ids){
-            buf.writeInt(i);
-        }
-    }
-
 
     public static class Handler implements IMessageHandler<WidgetUpdatePacket, IMessage> {
         @Override
@@ -128,12 +104,10 @@ public class WidgetUpdatePacket  implements IMessage {
         public IMessage onMessage(WidgetUpdatePacket message, MessageContext ctx) {
 
             switch (message.type) {
-                case AddWigets:
-                    renderToolkit.ClientSurface.instances.updateWidgets(message.widgetList.entrySet());
-                    break;
+                case AddWigets:         ClientSurface.instances.updateWidgets(message.widgetList.entrySet()); break;
+                case RemoveWidgets:     ClientSurface.instances.removeWidgets(message.ids); break;
+                case RemoveAllWidgets:  ClientSurface.instances.removeAllWidgets(); break;
             }
-
-
             return null;
         }
     }

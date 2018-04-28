@@ -1,7 +1,7 @@
 package ben_mkiv.rendertoolkit.proxy;
 
 import ben_mkiv.commons0815.utils.PlayerStats;
-import ben_mkiv.rendertoolkit.renderToolkit;
+import ben_mkiv.rendertoolkit.surface.ServerSurface;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -33,7 +33,7 @@ public class CommonProxy {
     }
 
     public PlayerStats getPlayerStats(UUID uuid) {
-        return renderToolkit.ServerSurface.instance.playerStats.get(uuid);
+        return ServerSurface.instances.playerStats.get(uuid);
     }
 
     public PlayerStats getPlayerStats(String playerName) {

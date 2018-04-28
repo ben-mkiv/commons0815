@@ -8,6 +8,7 @@ import ben_mkiv.rendertoolkit.common.widgets.component.face.Text2D;
 import ben_mkiv.rendertoolkit.common.widgets.component.world.Text3D;
 import ben_mkiv.commons0815.utils.ClientUtils;
 import ben_mkiv.rendertoolkit.renderToolkit;
+import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -229,7 +230,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 
 		public void updateRenderPosition(long conditionStates, Vec3d renderOffset){
 			Vec3d renderOrigin = renderOffset;
-			Vec3d renderPosition = WidgetModifierList.getRenderPosition(conditionStates, renderOrigin, renderToolkit.ClientSurface.resolution.getScaledWidth(), renderToolkit.ClientSurface.resolution.getScaledHeight(), 1);
+			Vec3d renderPosition = WidgetModifierList.getRenderPosition(conditionStates, renderOrigin, ClientSurface.resolution.getScaledWidth(), ClientSurface.resolution.getScaledHeight(), 1);
 			x = (float) (renderPosition.x + margin.x);
 			y = (float) (renderPosition.y + margin.y);
 			z = (float) (renderPosition.z + margin.z);

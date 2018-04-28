@@ -1,59 +1,97 @@
 package ben_mkiv.rendertoolkit.network.messages;
 
 import ben_mkiv.rendertoolkit.network.EventType;
+import ben_mkiv.rendertoolkit.surface.ClientSurface;
+import ben_mkiv.rendertoolkit.surface.ServerSurface;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 
 public class ClientEventPacket implements IMessage {
-    protected int pentid, dimId, targetId = -1;
-    protected BlockPos pos = new BlockPos(0, 0, 0);
-    protected EnumFacing face = EnumFacing.DOWN;
+    public  int pentid = -1, dimId = -1, targetId = -1;
+    public  BlockPos pos = new BlockPos(0, 0, 0);
+    public  Vec3d renderOffset = new Vec3d(0, 0, 0);
+    public  Vec3d resolution = new Vec3d(0, 0, 0);
+    public EventType type;
+    public EnumHand hand;
 
-    int x,y,mb;
+    public int x=-1,y=-1,mb=-1;
 
     public ClientEventPacket() {}
 
     public ClientEventPacket(EventType type, PlayerInteractEvent event){
+        this(type);
+
         EntityPlayer player = event.getEntityPlayer();
 
         this.pentid = player.getEntityId();
         this.dimId = player.dimension;
         this.pos = event.getPos();
-        this.face = event.getFace();
+        this.hand = event.getHand();
+    }
 
+    public ClientEventPacket(EventType type) {
+        this.type = type;
+    }
 
+    public ClientEventPacket(EventType type, Vec3d renderOffset) {
+        this(type);
+        this.renderOffset = renderOffset;
     }
 
     public ClientEventPacket(EventType type, EntityPlayer player, Vec3d mousePos, int mouseButton) {
+        this(type);
         this.pentid = player.getEntityId();
         this.dimId = player.dimension;
-
+        this.x = (int) Math.round(mousePos.x);
+        this.y = (int) Math.round(mousePos.y);
+        this.mb = mouseButton;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
+        this.type = EventType.values()[buf.readInt()];
+
         this.pentid = buf.readInt();
         this.dimId = buf.readInt();
         this.targetId = buf.readInt();
 
         this.pos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
 
-        this.face = EnumFacing.values()[buf.readInt()];
+        switch(this.type){
+            case GLASSES_SCREEN_SIZE:
+                this.resolution = new Vec3d(buf.readInt(), buf.readInt(), buf.readInt());
+                this.renderOffset = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+                break;
+            case INTERACT_OVERLAY:
+                this.x = buf.readInt();
+                this.y = buf.readInt();
+                this.mb = buf.readInt();
+                break;
+            case INTERACT_WORLD_RIGHT:
+            case INTERACT_WORLD_LEFT:
+            case INTERACT_WORLD_BLOCK_RIGHT:
+            case INTERACT_WORLD_BLOCK_LEFT:
+                this.hand = EnumHand.values()[buf.readInt()];
+                break;
+        }
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void toBytes(ByteBuf buf) {
+
+        buf.writeInt(this.type.ordinal());
+
         buf.writeInt(this.pentid);
         buf.writeInt(this.dimId);
         buf.writeInt(this.targetId);
@@ -62,36 +100,34 @@ public class ClientEventPacket implements IMessage {
         buf.writeInt(this.pos.getY());
         buf.writeInt(this.pos.getZ());
 
-        buf.writeInt(this.face.ordinal());
+        switch(this.type){
+            case GLASSES_SCREEN_SIZE:
+                buf.writeInt(ClientSurface.resolution.getScaledWidth());
+                buf.writeInt(ClientSurface.resolution.getScaledHeight());
+                buf.writeInt(ClientSurface.resolution.getScaleFactor());
+                buf.writeDouble(this.renderOffset.x);
+                buf.writeDouble(this.renderOffset.y);
+                buf.writeDouble(this.renderOffset.z);
+                break;
+            case INTERACT_OVERLAY:
+                buf.writeInt(this.x);
+                buf.writeInt(this.y);
+                buf.writeInt(this.mb);
+                break;
+            case INTERACT_WORLD_RIGHT:
+            case INTERACT_WORLD_LEFT:
+            case INTERACT_WORLD_BLOCK_RIGHT:
+            case INTERACT_WORLD_BLOCK_LEFT:
+                buf.writeInt(this.hand.ordinal());
+                break;
+        }
     }
 
     public static class Handler implements IMessageHandler<ClientEventPacket, IMessage> {
 
         @Override
         public IMessage onMessage(ClientEventPacket message, MessageContext ctx) {
-            World world = DimensionManager.getWorld(message.dimId);
-
-            EntityPlayer player = (EntityPlayer) world.getEntityByID(message.pentid);
-
-            if (player == null)
-                return null;
-
-
-
-            /*
-            ItemStack stackUsed = player.getHeldItemMainhand();
-            Entity target = null;
-
-            if(message.targetId != -1) {
-                target = world.getEntityByID(message.targetId);
-
-                if(target == null)
-                    return null;
-            }
-            */
-
-
-            return null;
+            return ServerSurface.instances.onClientEvent(message);
         }
     }
 

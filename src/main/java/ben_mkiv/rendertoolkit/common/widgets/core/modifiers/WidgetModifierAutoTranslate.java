@@ -1,6 +1,6 @@
 package ben_mkiv.rendertoolkit.common.widgets.core.modifiers;
 
-import ben_mkiv.rendertoolkit.renderToolkit;
+import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -29,9 +29,9 @@ public class WidgetModifierAutoTranslate extends WidgetModifierTranslate {
     public void applyEasings(){
         super.applyEasings();
 
-        if(renderToolkit.ClientSurface.instances != null){
-            renderX*=((double) renderToolkit.ClientSurface.resolution.getScaledWidth() / 100D);
-            renderY*=((double) renderToolkit.ClientSurface.resolution.getScaledHeight() / 100D);
+        if(ClientSurface.instances != null){
+            renderX*=((double) ClientSurface.resolution.getScaledWidth() / 100D);
+            renderY*=((double) ClientSurface.resolution.getScaledHeight() / 100D);
         }
     }
 

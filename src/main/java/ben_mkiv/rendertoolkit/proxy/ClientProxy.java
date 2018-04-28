@@ -1,7 +1,7 @@
 package ben_mkiv.rendertoolkit.proxy;
 
 import ben_mkiv.commons0815.utils.PlayerStats;
-import ben_mkiv.rendertoolkit.renderToolkit;
+import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -54,7 +54,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public PlayerStats getPlayerStats(UUID uuid) {
         PlayerStats s = new PlayerStats(getPlayer(""));
-        s.setScreen(renderToolkit.ClientSurface.resolution.getScaledWidth(), renderToolkit.ClientSurface.resolution.getScaledHeight(), (double) renderToolkit.ClientSurface.resolution.getScaleFactor());
+        s.setScreen(ClientSurface.resolution.getScaledWidth(), ClientSurface.resolution.getScaledHeight(), (double) ClientSurface.resolution.getScaleFactor());
         return s;
     }
 

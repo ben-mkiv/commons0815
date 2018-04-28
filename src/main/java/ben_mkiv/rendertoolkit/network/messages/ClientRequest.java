@@ -1,20 +1,13 @@
 package ben_mkiv.rendertoolkit.network.messages;
 
-import ben_mkiv.rendertoolkit.renderToolkit;
+import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-
-import java.util.logging.Logger;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ClientRequest implements IMessage {
     public enum EventType{
@@ -23,58 +16,62 @@ public class ClientRequest implements IMessage {
         SET_RENDER_RESOLUTION
     }
 
-    protected int pentid, dimId, targetId = -1;
+    protected double width,height,scale;
+
+    protected EventType type;
 
     public ClientRequest() {}
 
-    //todo: fix openglasses screen size network packets
-    public ClientRequest(EventType type) {
-        Logger.getLogger(renderToolkit.MODID).warning("THIS IS NUTZ");
+    //SET_RENDER_RESOLUTION
+    public ClientRequest(EventType type, double width, double height, double scale) {
+        this(type);
+        this.width = width;
+        this.height = height;
+        this.scale = scale;
     }
 
-    public ClientRequest(EventType type, EntityPlayer player, Vec3d mousePos, int mouseButton) {
-        this.pentid = player.getEntityId();
-        this.dimId = player.dimension;
-
+    //SYNC_SCREEN_SIZE, ASYNC_SCREEN_SIZES
+    public ClientRequest(EventType type) {
+        this.type = type;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        this.pentid = buf.readInt();
-        this.dimId = buf.readInt();
-        this.targetId = buf.readInt();
+        this.type = EventType.values()[buf.readInt()];
+
+        if(this.type.equals(EventType.SET_RENDER_RESOLUTION)){
+            this.width = buf.readDouble();
+            this.height = buf.readDouble();
+        }
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(this.pentid);
-        buf.writeInt(this.dimId);
-        buf.writeInt(this.targetId);
+        buf.writeInt(this.type.ordinal());
+
+        if(this.type.equals(EventType.SET_RENDER_RESOLUTION)){
+            buf.writeDouble(this.width);
+            buf.writeDouble(this.height);
+        }
     }
 
     public static class Handler implements IMessageHandler<ClientRequest, IMessage> {
-
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(ClientRequest message, MessageContext ctx) {
-            World world = DimensionManager.getWorld(message.dimId);
-
-            EntityPlayer player = (EntityPlayer) world.getEntityByID(message.pentid);
 
 
-            if (player == null)
-                return null;
+            switch(message.type){
+                case SET_RENDER_RESOLUTION:
+                    ClientSurface.instances.renderResolution = new Vec3d(message.width, message.height, message.scale);
+                    break;
+                case ASYNC_SCREEN_SIZES:
 
-            ItemStack stackUsed = player.getHeldItemMainhand();
-
-            Entity target = null;
-
-            if(message.targetId != -1) {
-                target = world.getEntityByID(message.targetId);
-
-                if(target == null)
-                    return null;
+                    break;
+                case SYNC_SCREEN_SIZE:
+                    ClientSurface.instances.sendResolution();
+                    break;
             }
-
 
             return null;
         }
