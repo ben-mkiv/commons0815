@@ -4,6 +4,7 @@ import ben_mkiv.rendertoolkit.network.EventType;
 import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import ben_mkiv.rendertoolkit.surface.ServerSurface;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -43,8 +44,13 @@ public class ClientEventPacket implements IMessage {
         this.type = type;
     }
 
+    @SideOnly(Side.CLIENT)
     public ClientEventPacket(EventType type, Vec3d renderOffset) {
         this(type);
+        EntityPlayer player = Minecraft.getMinecraft().player;
+
+        this.pentid = player.getEntityId();
+        this.dimId = player.dimension;
         this.renderOffset = renderOffset;
     }
 

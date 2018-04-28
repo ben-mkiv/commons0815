@@ -1,5 +1,7 @@
 package ben_mkiv.rendertoolkit.network.messages;
 
+import ben_mkiv.rendertoolkit.client.renderer.ClientRenderer;
+import ben_mkiv.rendertoolkit.network.EventType;
 import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.math.Vec3d;
@@ -63,14 +65,13 @@ public class ClientRequest implements IMessage {
 
             switch(message.type){
                 case SET_RENDER_RESOLUTION:
-                    ClientSurface.instances.renderResolution = new Vec3d(message.width, message.height, message.scale);
+                    ClientSurface.renderResolution = new Vec3d(message.width, message.height, message.scale);
                     break;
                 case ASYNC_SCREEN_SIZES:
-
-                    break;
-                case SYNC_SCREEN_SIZE:
                     ClientSurface.instances.sendResolution();
                     break;
+                case SYNC_SCREEN_SIZE:
+                    return new ClientEventPacket(ben_mkiv.rendertoolkit.network.EventType.GLASSES_SCREEN_SIZE, ClientSurface.instances.getRenderOffset());
             }
 
             return null;
