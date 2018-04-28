@@ -26,8 +26,7 @@ public class interactGuiScreen extends GuiScreen {
             mouseX*=(ClientSurface.renderResolution.x / ClientSurface.resolution.getScaledWidth());
             mouseY*=(ClientSurface.renderResolution.y / ClientSurface.resolution.getScaledHeight());
         }
-
-        rTkNetwork.channel.sendToServer(new ClientEventPacket(EventType.INTERACT_OVERLAY, mc.player, new Vec3d(mouseX, mouseY, 0), mouseButton));
+        rTkNetwork.channel.sendToServer(new ClientEventPacket(EventType.INTERACT_OVERLAY, mc.player, new Vec3d(mouseX, mouseY, mouseButton)));
     }
 
     @Override

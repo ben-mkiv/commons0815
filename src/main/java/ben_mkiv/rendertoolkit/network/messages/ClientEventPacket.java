@@ -48,13 +48,13 @@ public class ClientEventPacket implements IMessage {
         this.renderOffset = renderOffset;
     }
 
-    public ClientEventPacket(EventType type, EntityPlayer player, Vec3d mousePos, int mouseButton) {
+    public ClientEventPacket(EventType type, EntityPlayer player, Vec3d mouseData){
         this(type);
         this.pentid = player.getEntityId();
         this.dimId = player.dimension;
-        this.x = (int) Math.round(mousePos.x);
-        this.y = (int) Math.round(mousePos.y);
-        this.mb = mouseButton;
+        this.x = (int) Math.round(mouseData.x);
+        this.y = (int) Math.round(mouseData.y);
+        this.mb = (int) mouseData.z;
     }
 
     @Override
