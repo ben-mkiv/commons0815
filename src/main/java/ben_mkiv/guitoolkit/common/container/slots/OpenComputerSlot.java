@@ -1,6 +1,7 @@
 package ben_mkiv.guitoolkit.common.container.slots;
 
 import ben_mkiv.ocUtils.CustomDriver;
+import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.DriverItem;
 import li.cil.oc.api.driver.item.Container;
 import li.cil.oc.api.driver.item.Slot;
@@ -80,6 +81,12 @@ public class OpenComputerSlot extends filteredSlot {
 
         DriverItem drv = CustomDriver.driverFor(stack);
         if(drv == null)
+            return false;
+
+        if(!this.type.equals(drv.slot(stack)))
+            return false;
+
+        if(this.tier < drv.tier(stack))
             return false;
 
         return this.inventory.isItemValidForSlot(this.slotNumber, stack);
