@@ -13,10 +13,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class buttonClick implements IMessage {
-    public int dimId=-1;
+    public int dimId = Integer.MIN_VALUE;
 
     public NBTTagCompound nbt = new NBTTagCompound();
-    public int playerID = -1;
+    public int playerID = Integer.MIN_VALUE;
 
     public buttonClick(){}
 

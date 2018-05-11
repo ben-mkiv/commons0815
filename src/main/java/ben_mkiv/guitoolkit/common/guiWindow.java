@@ -2,9 +2,11 @@ package ben_mkiv.guitoolkit.common;
 
 import ben_mkiv.guitoolkit.client.widget.prettyButton;
 import ben_mkiv.rendertoolkit.common.widgets.component.face.Box2D;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 
 public class guiWindow extends GuiContainer {
     protected String name = "defaultName";
+    public boolean hasBackground = false;
 
     protected ArrayList<GuiTextField> textFields = new ArrayList<>();
     static Box2D box = new Box2D();
@@ -76,7 +79,12 @@ public class guiWindow extends GuiContainer {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {}
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        if(!hasBackground)
+            return;
+
+        drawDefaultBackground();
+    }
 
     @Override
     public boolean doesGuiPauseGame(){
