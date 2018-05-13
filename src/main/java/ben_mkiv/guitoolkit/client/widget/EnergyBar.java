@@ -23,6 +23,9 @@ public class EnergyBar extends prettyButton {
         if(bar != null)
             Minecraft.getMinecraft().renderEngine.bindTexture(bar);
 
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+
         RenderHelper.disableStandardItemLighting();
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -53,5 +56,7 @@ public class EnergyBar extends prettyButton {
 
         RenderHelper.enableStandardItemLighting();
         GL11.glDisable(GL11.GL_BLEND);
+
+        GL11.glPopAttrib();
     }
 }

@@ -3,11 +3,11 @@ package ben_mkiv.guitoolkit.common;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class guiHandler {
-    public static ArrayList<GUIScreen> screens = new ArrayList<>();
-    private static int screenIndex = 0;
+    public static HashMap<String, GUIScreen> screens = new HashMap<>();
+    protected static int screenIndex = 0;
 
     public static EntityPlayer player;
 
@@ -19,7 +19,7 @@ public class guiHandler {
         public Class<? extends guiWindow> client;
         public String clientClassname;
         public Class<? extends Container> server;
-        int index;
+        public int index;
 
         public GUIScreen(int index, Class client, String cName, Class server){
             this.server = server;
@@ -29,16 +29,21 @@ public class guiHandler {
         }
     }
 
+    public class dummyGUI {
+        public dummyGUI() {
+        }
+    }
+
     public static void register(Class client, Class server){
-        screens.add(new GUIScreen(screenIndex++, client, client.getSimpleName(), server));
+        screens.put(client.getSimpleName(), new GUIScreen(screenIndex++, client, client.getSimpleName(), server));
     }
 
     public static void register(String clientClassName, Class server){
-        screens.add(new GUIScreen(screenIndex++, dummyGUI.class, clientClassName, server));
+        screens.put(clientClassName, new GUIScreen(screenIndex++, dummyGUI.class, clientClassName, server));
     }
 
     public static int getIndex(Class c){
-        for(GUIScreen cS : screens){
+        for(GUIScreen cS : screens.values()){
             if(cS.server.equals(c))
                 return cS.index;
             if(cS.client.equals(c))
@@ -49,16 +54,11 @@ public class guiHandler {
     }
 
     public static int getIndex(String c){
-        for(GUIScreen cS : screens){
-            if(cS.clientClassname.equals(c))
-                return cS.index;
-        }
-
-        return -1;
+        return screens.get(c).index;
     }
 
     public static Class<? extends Container> getClassServer(int index){
-        for(GUIScreen screen : screens)
+        for(GUIScreen screen : screens.values())
             if(screen.index == index)
                 return screen.server;
 
@@ -66,7 +66,7 @@ public class guiHandler {
     }
 
     public static Class<? extends guiWindow> getClassClient(int index){
-        for(GUIScreen screen : screens)
+        for(GUIScreen screen : screens.values())
             if(screen.index == index)
                 return screen.client;
 
