@@ -13,6 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.List;
 
 public class OpenComputerSlot extends filteredSlot {
     private int tier = Tier.One();
@@ -97,6 +98,21 @@ public class OpenComputerSlot extends filteredSlot {
         return !type.equals(Slot.None) && tier != Tier.None();
     }
 
+
+    @Override
+    public List<String> getTooltip(List<String> tooltip){
+        switch(getSlotType()){
+            case "rack_mountable":
+                tooltip.add("Type: Server Slot");
+                break;
+            case "upgrade":
+                tooltip.add("Type: Upgrade Slot");
+                tooltip.add("Tier: " + (getTier()+1));
+                break;
+        }
+
+        return super.getTooltip(tooltip);
+    }
 
 
 

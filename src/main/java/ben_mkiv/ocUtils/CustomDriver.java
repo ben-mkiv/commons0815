@@ -30,7 +30,7 @@ public class CustomDriver {
     public static DriverItem driverFor(ItemStack stack, Class<? extends EnvironmentHost> host){
         for(DriverItem driver : CustomDriver.drivers)
             if(driver instanceof HostAware)
-                if(((HostAware) driver).worksWith(stack)) //, host
+                if(driver.worksWith(stack)) //, host
                     return driver;
 
         return Driver.driverFor(stack, host);

@@ -2,8 +2,10 @@ package ben_mkiv.guitoolkit.common.container.slots;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class filteredSlot extends customSlot {
     public ArrayList<ItemStack> whitelist = new ArrayList<>();
@@ -29,4 +31,22 @@ public class filteredSlot extends customSlot {
 
         return false;
     }
+
+    @Override
+    public List<String> getTooltip(List<String> tooltip){
+        if(whitelist.size() > 0) {
+            tooltip.add(TextFormatting.GREEN + "accepts: ");
+            for(ItemStack item : whitelist) {
+                tooltip.add(item.getDisplayName());
+            }
+        }
+        if(blacklist.size() > 0) {
+            tooltip.add(TextFormatting.RED + "blocked: ");
+            for(ItemStack item : blacklist)
+                tooltip.add(item.getDisplayName());
+        }
+
+        return super.getTooltip(tooltip);
+    }
+
 }

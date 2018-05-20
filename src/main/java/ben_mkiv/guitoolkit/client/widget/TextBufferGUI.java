@@ -31,7 +31,6 @@ public abstract class TextBufferGUI {
         if(this.get() == null)
             return;
 
-
         renderWidth = getRenderWidth(Integer.MAX_VALUE);
         renderHeight = getRenderHeight(Math.round(renderWidth));
         background.setSize(width + 2*padding, renderHeight + 2*padding);

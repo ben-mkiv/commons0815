@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -41,6 +40,12 @@ public class guiWindow extends GuiContainer {
             super(buttonList.size(), x, y, width, height, label);
             this.screen = screen;
         }
+    }
+
+    @Override
+    public void initGui(){
+        setGuiSize(Minecraft.getMinecraft().displayWidth / Minecraft.getMinecraft().gameSettings.guiScale, Minecraft.getMinecraft().displayHeight / Minecraft.getMinecraft().gameSettings.guiScale);
+        super.initGui();
     }
 
     @Override
