@@ -43,12 +43,6 @@ public class guiWindow extends GuiContainer {
     }
 
     @Override
-    public void initGui(){
-        setGuiSize(Minecraft.getMinecraft().displayWidth / Minecraft.getMinecraft().gameSettings.guiScale, Minecraft.getMinecraft().displayHeight / Minecraft.getMinecraft().gameSettings.guiScale);
-        super.initGui();
-    }
-
-    @Override
     public void drawScreen(int mx, int my, float partialTicks) {
         this.updateScreen();
 

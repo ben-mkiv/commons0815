@@ -88,15 +88,15 @@ public class utilsCommon {
 		return level * level + 6 * level;
 	}
 
-	public static double getLevelFromExp(long exp) {
+	public static int getLevelFromExp(long exp) {
 		if (exp > 1395) {
-			return (Math.sqrt(72 * exp - 54215) + 325) / 18;
+			return (int) Math.round((Math.sqrt(72 * exp - 54215) + 325) / 18);
 		}
 		if (exp > 315) {
-			return Math.sqrt(40 * exp - 7839) / 10 + 8.1;
+			return (int) Math.round(Math.sqrt(40 * exp - 7839) / 10 + 8.1);
 		}
 		if (exp > 0) {
-			return Math.sqrt(exp + 9) - 3;
+			return (int) Math.round(Math.sqrt(exp + 9) - 3);
 		}
 		return 0;
 	}

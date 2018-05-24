@@ -35,7 +35,7 @@ public class prettyList {
 
         for(int i=scrollValue, s=0; i < (elements.size()) && i < (scrollValue + displayElements); i++, s++){
             for(prettyButton button : elements.get(i)){
-                button.y+= (button.height * s);
+                button.y= y + (button.height * s);
                 button.x+= x;
                 button.visible = true;
             }
