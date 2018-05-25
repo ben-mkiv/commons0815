@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -192,8 +193,8 @@ public class utilsCommon {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static Entity getEntityLookingAt(EntityLivingBase player){
-		RayTraceResult objectMouseOver = player.rayTrace(128, 1);
+	public static Entity getEntityLookingAt(){
+		RayTraceResult objectMouseOver = Minecraft.getMinecraft().player.rayTrace(128, 1);
 		if(objectMouseOver != null && objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY){
 			return objectMouseOver.entityHit;
 		}
@@ -207,6 +208,12 @@ public class utilsCommon {
 		Vec3d vec3d2 = vec3d.addVector(vec3d1.x * range, vec3d1.y * range, vec3d1.z * range);
 
 		return entity.world.rayTraceBlocks(vec3d, vec3d2);
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static Entity getFocusedEntity(){
+		EntityPlayer player = Minecraft.getMinecraft().player;
+		return player.isSneaking() ? player : Minecraft.getMinecraft().objectMouseOver.entityHit;
 	}
 
 }
