@@ -1,5 +1,6 @@
 package ben_mkiv.guitoolkit.client.widget;
 
+import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
@@ -117,8 +118,14 @@ public class prettyList implements prettyElement {
         this.add(list);
     }
 
-    public boolean isPointInRegion(int x, int y){
-        return x >= getX() && x < getX() + getWidth() && y >= getY() && y < getY() + getHeight();
+    public boolean isMouseOver(){
+        for(ArrayList<prettyElement> entry : elements)
+            for(prettyElement element : entry)
+                if(element instanceof prettyButton)
+                    if(((prettyButton) element).isMouseOver())
+                        return true;
+
+        return false;
     }
 
     public void update(){
@@ -129,10 +136,10 @@ public class prettyList implements prettyElement {
         if(!getVisible())
             return;
 
-        if(isPointInRegion(Mouse.getX(), Mouse.getY())) {
+        if(isMouseOver())
             scrollValue -= Integer.signum(Mouse.getDWheel());
-            scrollValue = Math.max(0, Math.min(scrollValue, (elements.size() - displayElements)));
-        }
+
+        scrollValue = Math.max(0, Math.min(scrollValue, (elements.size() - displayElements)));
 
         for(int i=0; i < scrollValue; i++)
             for(prettyElement element : elements.get(i))
