@@ -1,7 +1,6 @@
 package ben_mkiv.guitoolkit.client.widget;
 
 import org.lwjgl.input.Mouse;
-import scala.Int;
 
 import java.util.ArrayList;
 
@@ -33,10 +32,12 @@ public class prettyList implements prettyElement {
             if(!(element instanceof prettyList))
                 maxHeight = Math.max(maxHeight, element.getHeight());
 
+            /*
             if(element instanceof prettyButton) {
-                //((prettyButton) element).renderX = getX();
-                //((prettyButton) element).renderY = getY();
+                ((prettyButton) element).renderX = getX();
+                ((prettyButton) element).renderY = getY();
             }
+            */
         }
 
         elementHeight = Math.max(elementHeight, maxHeight);
@@ -98,6 +99,12 @@ public class prettyList implements prettyElement {
 
     @Override // Interface prettyElement
     public void setVisible(boolean isVisible){
+
+        if(!isVisible)
+            for (ArrayList<prettyElement> el : elements)
+                for(prettyElement entry : el)
+                    entry.setVisible(false);
+
         visible = isVisible;
     }
 
@@ -129,19 +136,23 @@ public class prettyList implements prettyElement {
 
         for(int i=0; i < scrollValue; i++)
             for(prettyElement element : elements.get(i))
-                element.setVisible(false);
+                if(element instanceof prettyButton)
+                    element.setVisible(false);
 
         for(int i=scrollValue+displayElements-1; i < elements.size(); i++)
             for(prettyElement element : elements.get(i))
-                element.setVisible(false);
+                if(element instanceof prettyButton)
+                    element.setVisible(false);
 
 
         for(int i=scrollValue, s=0; i < (elements.size()) && i < (scrollValue + displayElements); i++, s++){
             for(prettyElement element : elements.get(i)){
                 element.setY(getY() + (element.getHeight() * s));
-                //element.setX(getX() + element.getX());
-                element.setVisible(true);
+                if(element instanceof prettyButton)
+                    element.setVisible(true);
             }
+
+
         }
     }
 
@@ -188,6 +199,22 @@ public class prettyList implements prettyElement {
 
     public int getDisplayElements(){
         return this.displayElements;
+    }
+
+    public void hideGroups(){
+        hideGroups(0);
+    }
+
+    public void hideGroups(int maxLevel){
+        setVisible(false);
+
+        if(maxLevel >= 0)
+            setVisible(true);
+
+        for(ArrayList<prettyElement> entry : elements)
+            if(isList(entry))
+                getList(entry).hideGroups(maxLevel - 1);
+
     }
 
 }
