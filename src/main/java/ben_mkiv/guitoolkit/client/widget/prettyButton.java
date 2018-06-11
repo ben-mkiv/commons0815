@@ -10,8 +10,8 @@ import org.lwjgl.opengl.GL11;
 import java.util.ArrayList;
 import java.util.List;
 
-public class prettyButton extends GuiButton {
-    public enum alignment { LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM }
+public class prettyButton extends GuiButton implements prettyElement {
+    public enum alignment {LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM}
 
     public int marginLeft = 0, marginRight = 0, marginTop = 0, marginBottom = 0;
 
@@ -23,30 +23,72 @@ public class prettyButton extends GuiButton {
 
     public String action;
 
-    public prettyButton(int id, int x, int y, int width, int height, String label){
+    public int renderX = 0, renderY = 0;
+
+    public prettyButton(int id, int x, int y, int width, int height, String label) {
         super(id, x, y, width, height, label);
         action = label;
     }
 
-    public boolean renderTooltip(Minecraft mc, int mx, int my){
-        if(tooltip.size() < 1)
+    public boolean renderTooltip(Minecraft mc, int mx, int my) {
+        if (tooltip.size() < 1)
             return false;
 
-        if(!this.visible)
+        if (!this.visible)
             return false;
 
-        if(!this.isPointInRegion(mx, my))
+        if (!this.isPointInRegion(mx, my))
             return false;
 
         return true;
     }
 
-    private boolean isPointInRegion(int x, int y){
+    @Override // Interface prettyElement
+    public int getY() {
+        return this.y;
+    }
+
+    @Override // Interface prettyElement
+    public int getX() {
+        return this.x;
+    }
+
+    @Override // Interface prettyElement
+    public int getWidth() {
+        return this.width;
+    }
+
+    @Override // Interface prettyElement
+    public int getHeight() {
+        return this.height;
+    }
+
+    @Override // Interface prettyElement
+    public void setY(int pos) {
+        this.y = pos;
+    }
+
+    @Override // Interface prettyElement
+    public void setX(int pos) {
+        this.x = pos;
+    }
+
+    @Override // Interface prettyElement
+    public void setVisible(boolean isVisible) {
+        visible = isVisible;
+    }
+
+    @Override // Interface prettyElement
+    public boolean getVisible() {
+        return visible;
+    }
+
+    private boolean isPointInRegion(int x, int y) {
         return !(x < this.x || x > this.x + this.width || y < this.y || y > this.y + this.height);
     }
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)    {
+    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks){
         if (!this.visible)
             return;
 
@@ -59,12 +101,15 @@ public class prettyButton extends GuiButton {
 
         int i = this.getHoverState(this.hovered);
 
+        int renderX = this.renderX + this.x;
+        int renderY = this.renderY + this.y;
+
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 
-        this.drawTexturedModalRect(this.x, this.y, 0, 46 + i * 20, this.width / 2, this.height);
-        this.drawTexturedModalRect(this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
+        this.drawTexturedModalRect(renderX, renderY, 0, 46 + i * 20, this.width / 2, this.height);
+        this.drawTexturedModalRect(renderX + this.width / 2, renderY, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
 
         this.mouseDragged(mc, mouseX, mouseY);
 
@@ -81,26 +126,26 @@ public class prettyButton extends GuiButton {
 
         switch(horizontalAlignment){
             case RIGHT:
-                posX = -marginRight + this.x + this.width - (fontrenderer.getStringWidth(this.displayString) / 2);
+                posX = -marginRight + renderX + this.width - (fontrenderer.getStringWidth(this.displayString) / 2);
                 break;
             case LEFT:
-                posX = marginLeft + this.x + (fontrenderer.getStringWidth(this.displayString) / 2);
+                posX = marginLeft + renderX + (fontrenderer.getStringWidth(this.displayString) / 2);
                 break;
             case CENTER:
             default:
-                posX = this.x + this.width / 2; break;
+                posX = renderX + this.width / 2; break;
         }
 
         switch(verticalAlignment){
             case BOTTOM:
-                posY = -marginBottom + this.y + this.height - fontrenderer.FONT_HEIGHT;
+                posY = -marginBottom + renderY + this.height - fontrenderer.FONT_HEIGHT;
                 break;
             case TOP:
-                posY = marginTop + this.y;
+                posY = marginTop + renderY;
                 break;
             case MIDDLE:
             default:
-                posY = this.y + (this.height-fontrenderer.FONT_HEIGHT) / 2; break;
+                posY = renderY + (this.height-fontrenderer.FONT_HEIGHT) / 2; break;
         }
 
 
