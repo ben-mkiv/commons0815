@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 public class hotkeyEvent {
     public String action = "unknown";
-    public int key = -1;
 
     public ArrayList<String> group = new ArrayList<>();
 
@@ -16,14 +15,22 @@ public class hotkeyEvent {
     }
 
     public hotkeyEvent(NBTTagCompound nbt){
+        this("readFromNBT");
         readFromNBT(nbt);
     }
 
     public boolean execute(EntityPlayer player){ return false; }
 
+    public boolean canExecute(EntityPlayer player){
+        return true;
+    }
+
     public NBTTagCompound writeToNBT(NBTTagCompound nbt){
-        nbt.setInteger("key", this.key);
         nbt.setString("action", this.action);
+
+        for(int i=0; nbt.hasKey("group"+i); i++)
+            nbt.removeTag("group"+i);
+
         for(int i=0; i < group.size(); i++)
             nbt.setString("group"+i, group.get(i));
 
@@ -31,13 +38,12 @@ public class hotkeyEvent {
     }
 
     public void readFromNBT(NBTTagCompound nbt){
-        this.key = nbt.getInteger("key");
         this.action = nbt.getString("action");
+        this.group.clear();
 
-        group.clear();
-        int i=0;
-        while(nbt.hasKey("group"+i))
-            group.add(nbt.getString("group"+i));
+        for(int i=0; nbt.hasKey("group"+i); i++)
+            this.group.add(nbt.getString("group"+i));
     }
+
 
 }
