@@ -1,7 +1,6 @@
-package ben_mkiv.openentity.common.container.slots;
+package ben_mkiv.guitoolkit.common.container.slots;
 
-import ben_mkiv.guitoolkit.common.container.slots.filteredSlot;
-import ben_mkiv.openentity.common.capability.hotkeys.hotkeyEvent;
+import ben_mkiv.commons0815.utils.hotkeyEvent;
 import net.minecraft.inventory.IInventory;
 
 

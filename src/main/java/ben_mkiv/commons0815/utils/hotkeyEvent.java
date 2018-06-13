@@ -1,4 +1,4 @@
-package ben_mkiv.openentity.common.capability.hotkeys;
+package ben_mkiv.commons0815.utils;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,7 +19,7 @@ public class hotkeyEvent {
         readFromNBT(nbt);
     }
 
-    public void execute(EntityPlayer player){}
+    public boolean execute(EntityPlayer player){ return false; }
 
     public NBTTagCompound writeToNBT(NBTTagCompound nbt){
         nbt.setInteger("key", this.key);
