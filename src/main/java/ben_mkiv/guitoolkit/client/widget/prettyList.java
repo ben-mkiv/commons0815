@@ -1,6 +1,5 @@
 package ben_mkiv.guitoolkit.client.widget;
 
-import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
@@ -151,16 +150,14 @@ public class prettyList implements prettyElement {
                 if(element instanceof prettyButton)
                     element.setVisible(false);
 
-
         for(int i=scrollValue, s=0; i < (elements.size()) && i < (scrollValue + displayElements); i++, s++){
             for(prettyElement element : elements.get(i)){
                 element.setY(getY() + (element.getHeight() * s));
                 if(element instanceof prettyButton)
                     element.setVisible(true);
             }
-
-
         }
+
     }
 
     public boolean isList(ArrayList<prettyElement> listElement){
