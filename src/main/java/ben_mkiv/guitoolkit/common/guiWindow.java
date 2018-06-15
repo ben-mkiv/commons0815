@@ -43,6 +43,14 @@ public class guiWindow extends GuiContainer {
     }
 
     @Override
+    public void initGui(){
+        super.initGui();
+        guiTop = 0;
+        //guiLeft = 0;
+    }
+
+
+    @Override
     public void drawScreen(int mx, int my, float partialTicks) {
         this.updateScreen();
 
