@@ -8,7 +8,7 @@ public class HotkeySyncSlot extends filteredSlot {
     public hotkeyEvent event;
 
     public HotkeySyncSlot(IInventory customInventory, int slot, int x, int y, int offsetY, hotkeyEvent event, String label){
-        super(customInventory, slot, x, y - 8);
+        super(customInventory, slot, x, y + offsetY);
         this.event = event;
 
         String tooltip = "";
