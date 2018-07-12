@@ -3,8 +3,8 @@ package ben_mkiv.guitoolkit.common.container.slots;
 import ben_mkiv.inventoryUtils.ConsumingInventory;
 
 public class consumingSlot extends filteredSlot {
-    public consumingSlot(ConsumingInventory inventoryIn, int index, int xPosition, int yPosition){
-        super(inventoryIn, index, xPosition, yPosition);
+    public consumingSlot(ConsumingInventory inventory, int index, int xPosition, int yPosition){
+        super(inventory, index, xPosition, yPosition);
     }
 
     private ConsumingInventory getInventory(){
@@ -14,6 +14,8 @@ public class consumingSlot extends filteredSlot {
     @Override
     public void onSlotChanged(){
         super.onSlotChanged();
-        getInventory().onSlotChanged(getSlotIndex());
+        getInventory().onContentsChanged(getSlotIndex());
     }
+
+
 }

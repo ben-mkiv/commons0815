@@ -1,20 +1,19 @@
 package ben_mkiv.inventoryUtils;
 
-import ben_mkiv.guitoolkit.common.container.IConsumingSlotCallback;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ConsumingInventory extends Inventory implements IConsumingSlotCallback {
-    IConsumingSlotCallback cb;
+public class ConsumingInventory extends ClientInventory {
     HashMap<Integer, ArrayList<ItemStack>> whitelists = new HashMap<>();
     HashMap<Integer, ArrayList<ItemStack>> blacklists = new HashMap<>();
 
-    public ConsumingInventory(int size, IConsumingSlotCallback cb){
+    public ConsumingInventory(int size, Container container){
+        super(size, container);
         setSize(size);
-        this.cb = cb;
     }
 
     public void addBlacklistItem(int slot, ItemStack item){
@@ -45,16 +44,11 @@ public class ConsumingInventory extends Inventory implements IConsumingSlotCallb
             return new ArrayList<>();
     }
 
-    public void onSlotChanged(int slot){
-        this.cb.onSlotChanged(slot);
-    }
-
     //no idea why, but we have to override this, even if it does the same...
     @Override
     @Nonnull
     public ItemStack getStackInSlot(int slot){
         validateSlotIndex(slot);
-
         return this.stacks.get(slot);
     }
 }

@@ -2,8 +2,10 @@ package ben_mkiv.guitoolkit.common;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 public class guiHandler {
     public static HashMap<String, GUIScreen> screens = new HashMap<>();
@@ -39,7 +41,16 @@ public class guiHandler {
     }
 
     public static void register(String clientClassName, Class server){
-        screens.put(clientClassName, new GUIScreen(screenIndex++, dummyGUI.class, clientClassName, server));
+        Class clientClass = dummyGUI.class;
+
+
+        if(FMLCommonHandler.instance().getEffectiveSide().isClient()) try {
+            clientClass = server.getClassLoader().loadClass(clientClassName).getClass();
+        } catch (Exception ex) {
+            Logger.getLogger("commons0815").warning("cant find class: " + clientClassName);
+        }
+
+        screens.put(clientClassName, new GUIScreen(screenIndex++, clientClass, clientClassName, server));
     }
 
     public static int getIndex(Class c){

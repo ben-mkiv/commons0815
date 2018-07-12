@@ -3,12 +3,11 @@ package ben_mkiv.guitoolkit.common.container.slots;
 import ben_mkiv.commons0815.utils.hotkeyEvent;
 import net.minecraft.inventory.IInventory;
 
-
 public class HotkeySyncSlot extends filteredSlot {
     public hotkeyEvent event;
 
-    public HotkeySyncSlot(IInventory customInventory, int slot, int x, int y, int offsetY, hotkeyEvent event, String label){
-        super(customInventory, slot, x, y + offsetY);
+    public HotkeySyncSlot(IInventory inventory, int inventorySlotIndex, int x, int y, int offsetY, hotkeyEvent event){
+        super(inventory, inventorySlotIndex, x, y + offsetY);
         this.event = event;
 
         String tooltip = "";

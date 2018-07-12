@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 
-public class ClientInventory  extends Inventory  {
+public class ClientInventory extends Inventory implements IContentChangedListener {
     Container container;
 
     public ClientInventory(int size, Container container){
