@@ -125,7 +125,7 @@ public abstract class Inventory extends ItemStackHandler implements IItemHandler
         this.setSize(slotCount);
 
         for(int i=0; i < oldItems.size() && i < slotCount; i++)
-            this.setStackInSlot(i, oldItems.get(i));
+            setStackInSlot(i, oldItems.get(i));
 
         return true;
     }

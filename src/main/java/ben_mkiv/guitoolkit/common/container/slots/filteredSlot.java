@@ -19,15 +19,15 @@ public class filteredSlot extends customSlot {
     public boolean isItemValid(ItemStack stack)
     {
         if(blacklist.size() == 0 && whitelist.size() == 0)
-            return true;
+            return super.isItemValid(stack);
 
         for(ItemStack blocked : blacklist)
-            if(ItemStack.areItemsEqual(new ItemStack(stack.getItem(), blocked.getCount(), stack.getMetadata()), blocked))
+            if(ItemStack.areItemsEqual(stack, blocked))
                 return false;
 
         for(ItemStack allowed : whitelist)
-            if(ItemStack.areItemsEqual(new ItemStack(stack.getItem(), allowed.getCount(), stack.getMetadata()), allowed))
-                return true;
+            if(ItemStack.areItemsEqual(stack, allowed))
+                return super.isItemValid(stack);
 
         return false;
     }
