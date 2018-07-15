@@ -2,7 +2,6 @@ package ben_mkiv.guitoolkit.common;
 
 import ben_mkiv.guitoolkit.client.widget.prettyButton;
 import ben_mkiv.rendertoolkit.common.widgets.component.face.Box2D;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -64,11 +63,6 @@ public class guiWindow extends GuiContainer {
         for (GuiTextField tF : textFields)
             tF.drawTextBox();
 
-        for(GuiButton button : buttonList)
-            if(button instanceof prettyButton)
-                if(((prettyButton) button).renderTooltip(mc, mx, my))
-                    drawHoveringText(((prettyButton) button).tooltip, mx, my, mc.fontRenderer);
-
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_BLEND);
     }
@@ -91,6 +85,16 @@ public class guiWindow extends GuiContainer {
             return;
 
         drawDefaultBackground();
+    }
+
+    @Override
+    protected void drawGuiContainerForegroundLayer(int mx, int my) {
+        super.drawGuiContainerForegroundLayer(mx, my);
+
+        for(GuiButton button : buttonList)
+            if(button instanceof prettyButton)
+                if(((prettyButton) button).renderTooltip(mc, mx, my))
+                    drawHoveringText(((prettyButton) button).tooltip, mx - getGuiLeft(), my - getGuiTop(), mc.fontRenderer);
     }
 
     @Override

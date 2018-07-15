@@ -24,7 +24,14 @@ public class ItemUtil {
     }
 
     public static void dropInventory(IInventory inventory, Entity entity){
-        if(inventory == null || entity == null)
+        if(entity == null)
+            return;
+
+        dropInventory(inventory, entity.world, entity.getPosition());
+    }
+
+    public static void dropInventory(IInventory inventory, World world, BlockPos pos){
+        if(inventory == null)
             return;
 
         ArrayList<ItemStack> drop = new ArrayList<>();
@@ -33,7 +40,7 @@ public class ItemUtil {
             if(!inventory.getStackInSlot(i).isEmpty())
                 drop.add(inventory.getStackInSlot(i));
 
-        ItemUtil.dropItemList(drop, entity.world, entity.getPosition(), true);
+        ItemUtil.dropItemList(drop, world, pos, true);
     }
 
     public static void dropItemList(ArrayList<ItemStack> items, World world, BlockPos pos, boolean motion){

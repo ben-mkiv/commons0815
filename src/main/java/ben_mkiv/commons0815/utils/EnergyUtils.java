@@ -27,4 +27,17 @@ public class EnergyUtils {
         }
     }
 
+    public static String formatValue(int value){
+        String suffix = "";
+
+        double newValue = value;
+
+        for (String s : new String[] {"k", "M", "G", "T"}) {
+            if (newValue < 1000) break;
+            suffix = s;
+            newValue /= 1000;
+        }
+        return Math.round(newValue * 100)/100 + suffix;
+    }
+
 }
