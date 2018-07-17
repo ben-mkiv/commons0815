@@ -45,32 +45,32 @@ public class WidgetModifiers {
 
 	public int addTranslate(float x, float y, float z){
 		this.modifiers.add(new WidgetModifierTranslate(x, y, z));
-		return this.modifiers.size();
+		return this.modifiers.size()-1;
 	}
 
 	public int addAutoTranslate(float x, float y){
 		this.modifiers.add(new WidgetModifierAutoTranslate(x, y));
-		return this.modifiers.size();
+		return this.modifiers.size()-1;
 	}
 		
 	public int addScale(float x, float y, float z){
 		this.modifiers.add(new WidgetModifierScale(x, y, z));
-		return this.modifiers.size();
+		return this.modifiers.size()-1;
 	}
 		
 	public int addRotate(float deg, float x, float y, float z){
 		this.modifiers.add(new WidgetModifierRotate(deg, x, y, z));
-		return this.modifiers.size();
+		return this.modifiers.size()-1;
 	}
 
 	public int addColor(float r, float g, float b, float alpha){
 		this.modifiers.add(new WidgetModifierColor(r, g, b, alpha));
-		return this.modifiers.size();
+		return this.modifiers.size()-1;
 	}
 	
 	public int addTexture(String texloc) {
 		this.modifiers.add(new WidgetModifierTexture(texloc));
-		return this.modifiers.size();
+		return this.modifiers.size()-1;
 	}
 
 	public void revoke(long conditionStates){
