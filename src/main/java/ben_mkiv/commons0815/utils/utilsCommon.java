@@ -79,6 +79,19 @@ public class utilsCommon {
 		return true;
 	}
 
+	public static int getTierFromXP(int level){
+		if(level >= 40)
+			return 4;
+		else if(level >= 30)
+			return 3;
+		else if(level >= 20)
+			return 2;
+		else if(level >= 10)
+			return 1;
+
+		return 0;
+	}
+
 	public static int getExpFromLevel(int level) {
 		if (level > 30) {
 			return (int) (4.5 * level * level - 162.5 * level + 2220);
