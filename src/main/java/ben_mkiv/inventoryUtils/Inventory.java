@@ -15,6 +15,9 @@ import java.util.ArrayList;
 
 //TODO: reimplement checkInventorySpace()
 public abstract class Inventory extends ItemStackHandler implements IItemHandler, IInventory{
+    public boolean drawBackground = true;
+    public boolean drawBackgroundMerged = true;
+
     public boolean ignoreNullStacks(){
         return false;
     }

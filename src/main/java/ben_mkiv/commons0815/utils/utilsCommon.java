@@ -171,6 +171,11 @@ public class utilsCommon {
 	    return col.getRGB();
 	}
 
+	public static int getIntFromColor(float color[], float alpha){
+		Color col = new Color(color[0], color[1], color[2], alpha);
+		return col.getRGB();
+	}
+
 	public static Vector3f getVector3fFromColor(int color){
 		Color col = new Color(color);
 		return new Vector3f(col.getRed(), col.getGreen(),col.getBlue());

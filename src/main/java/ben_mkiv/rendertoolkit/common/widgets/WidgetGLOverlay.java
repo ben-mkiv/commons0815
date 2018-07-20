@@ -2,6 +2,8 @@ package ben_mkiv.rendertoolkit.common.widgets;
 
 import ben_mkiv.commons0815.utils.PlayerStats;
 import ben_mkiv.commons0815.utils.utilsCommon;
+import ben_mkiv.rendertoolkit.common.widgets.component.common.EntityWidget;
+import ben_mkiv.rendertoolkit.common.widgets.component.common.FluidWidget;
 import ben_mkiv.rendertoolkit.common.widgets.component.common.ItemIcon;
 import ben_mkiv.rendertoolkit.common.widgets.component.face.Box2D;
 import ben_mkiv.rendertoolkit.common.widgets.component.face.Text2D;
@@ -194,7 +196,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 				doBlending = true;
 				GL11.glDisable(GL11.GL_ALPHA_TEST);
 			}
-			else if(type.equals(ItemIcon.RenderableItemIcon.class)){
+			else if(type.equals(ItemIcon.RenderableItemIcon.class) || type.equals(EntityWidget.RenderableEntity.class) || type.equals(FluidWidget.RenderableFluidIcon.class)){
 				doBlending = true;
 				doTexture = true;
 			}

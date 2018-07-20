@@ -3,11 +3,8 @@ package ben_mkiv.rendertoolkit.common.widgets;
 import ben_mkiv.commons0815.utils.utilsCommon;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEasing;
 import ben_mkiv.rendertoolkit.common.widgets.core.modifiers.*;
-import ben_mkiv.commons0815.utils.PlayerStats;
-import ben_mkiv.rendertoolkit.renderToolkit;
 import io.netty.buffer.ByteBuf;
 
-import net.minecraft.entity.player.EntityPlayer;
 import java.util.ArrayList;
 
 import ben_mkiv.commons0815.chickenbones.Matrix4;
@@ -110,14 +107,14 @@ public class WidgetModifiers {
 	}
 
 	public float[] getCurrentColorFloat(long conditionStates, int index){
-		for(int i=this.modifiers.size() - 1; i >= 0; i--){
-			if(this.modifiers.get(i).getType() == WidgetModifier.WidgetModifierType.COLOR &&
-				this.modifiers.get(i).shouldApplyModifier(conditionStates) == true){					
+		for(WidgetModifier modifier : modifiers){
+			if(modifier.getType() == WidgetModifier.WidgetModifierType.COLOR &&
+					modifier.shouldApplyModifier(conditionStates) == true){
 				if(index > 0){
 					index--;
 				}
 				else {
-					Object[] color = this.modifiers.get(i).getValues();
+					Object[] color = modifier.getValues();
 					return new float[]{ (float) color[0], (float) color[1], (float) color[2], (float) color[3] };
 				}
 			}
@@ -127,9 +124,9 @@ public class WidgetModifiers {
 
 	public float[] getCurrentScaleFloat(long conditionStates){
 		float scaleX = 1, scaleY = 1, scaleZ = 1;
-		for(int i=0; i < this.modifiers.size(); i++){
-			if(this.modifiers.get(i).getType() == WidgetModifier.WidgetModifierType.SCALE && this.modifiers.get(i).shouldApplyModifier(conditionStates) == true){
-				Object[] scale = this.modifiers.get(i).getValues();
+		for(WidgetModifier modifier : modifiers){
+			if(modifier.getType() == WidgetModifier.WidgetModifierType.SCALE && modifier.shouldApplyModifier(conditionStates)){
+				Object[] scale = modifier.getValues();
 				scaleX *= (float) scale[0];
 				scaleY *= (float) scale[1];
 				scaleZ *= (float) scale[2];
@@ -139,9 +136,9 @@ public class WidgetModifiers {
 	}
 
 	public void apply(long conditionStates){
-		this.lastConditionStates = conditionStates;
-		for(int i=0, count = this.modifiers.size(); i < count; i++) 
-			this.modifiers.get(i).apply(conditionStates);
+		lastConditionStates = conditionStates;
+		for(WidgetModifier modifier : modifiers)
+			modifier.apply(conditionStates);
 	}
 
 	public Vec3d getRenderPosition(long conditionStates, Vec3d offset, int w, int h, int d){
@@ -154,22 +151,22 @@ public class WidgetModifiers {
 	public Vec3d generateGlMatrix(long conditionStates, float w, float h, float d){
 		Matrix4 m = new Matrix4();
 		Object[] b;
-		for(int i=0, count = this.modifiers.size(); i < count; i++)
-			if(this.modifiers.get(i).shouldApplyModifier(conditionStates)) switch(this.modifiers.get(i).getType()){
+		for(WidgetModifier modifier : modifiers)
+			if(modifier.shouldApplyModifier(conditionStates)) switch(modifier.getType()){
 				case AUTOTRANSLATE:
-					b = this.modifiers.get(i).getValues();
+					b = modifier.getValues();
 					m.translate(new Vector3f((float) b[0]*(w/100F), (float) b[1]*(h / 100F), d));
 					break;
 				case TRANSLATE:
-					b = this.modifiers.get(i).getValues();
+					b = modifier.getValues();
 					m.translate(new Vector3f((float) b[0], (float) b[1], (float) b[2]));
 					break;
 				case SCALE:
-					b = this.modifiers.get(i).getValues();
+					b = modifier.getValues();
 					m.scale(new Vector3f((float) b[0], (float) b[1], (float) b[2])); 
 					break;
 				case ROTATE:
-					b = this.modifiers.get(i).getValues();
+					b = modifier.getValues();
 					m.rotate((float) b[0], new Vector3f((float) b[1], (float) b[2], (float) b[3])); 					
 					break;
 		}

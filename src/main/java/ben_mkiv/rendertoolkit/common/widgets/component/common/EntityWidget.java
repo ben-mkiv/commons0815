@@ -4,6 +4,7 @@ import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.RenderType;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetGLWorld;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEntity;
+import ben_mkiv.rendertoolkit.common.widgets.core.modifiers.WidgetModifierRotate;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -69,7 +70,7 @@ public abstract class EntityWidget extends WidgetGLWorld implements IEntity {
                 return;
 
             int alphaColor = this.preRender(conditionStates, renderOffset);
-            this.applyModifiers(conditionStates);
+            applyModifiers(conditionStates);
 
             if(rendertype == RenderType.WorldLocated) {
                 GL11.glTranslatef(0.5F, 0.5F, 0.5F);
@@ -88,7 +89,7 @@ public abstract class EntityWidget extends WidgetGLWorld implements IEntity {
                 GL11.glRotated(180, 1, 0, 0);
             }
 
-            renderEntity();
+            renderEntity(((WidgetModifierRotate) WidgetModifierList.modifiers.get(0)).Y, renderOffset.x, renderOffset.y, renderOffset.z);
 
             this.postRender();
         }
@@ -113,55 +114,36 @@ public abstract class EntityWidget extends WidgetGLWorld implements IEntity {
             }
         }
 
-        public void renderEntity() {
-            if(entity == null || !(entity instanceof EntityLivingBase))
+        public void renderEntity(float rotation, double posX, double posY, double posZ) {
+            if(entity == null)
                 return;
-            
-            float posX = 200, posY = 200;
-            float scale = 40;
-            int mouseX = 0;
-            int mouseY = 0;
+
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
             GlStateManager.enableColorMaterial();
             GlStateManager.pushMatrix();
-            GlStateManager.enableTexture2D();
-            GlStateManager.translate((float)posX, (float)posY, 50.0F);
-            GlStateManager.scale((float)(-scale), (float)scale, (float)scale);
-            GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
-            float f = entity.renderYawOffset;
-            float f1 = entity.rotationYaw;
-            float f2 = entity.rotationPitch;
-            float f3 = entity.prevRotationYawHead;
-            float f4 = entity.rotationYawHead;
+
+            GlStateManager.translate(posX, -posY, -50F);
+            GlStateManager.scale(50, 50, 50);
+
             GlStateManager.rotate(135.0F, 0.0F, 1.0F, 0.0F);
             RenderHelper.enableStandardItemLighting();
             GlStateManager.rotate(-135.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(-((float)Math.atan((double)(mouseY / 40.0F))) * 20.0F, 1.0F, 0.0F, 0.0F);
-            entity.renderYawOffset = (float)Math.atan((double)(mouseX / 40.0F)) * 20.0F;
-            entity.rotationYaw = (float)Math.atan((double)(mouseX / 40.0F)) * 40.0F;
-            entity.rotationPitch = -((float)Math.atan((double)(mouseY / 40.0F))) * 20.0F;
-            entity.rotationYawHead = entity.rotationYaw;
-            entity.prevRotationYawHead = entity.rotationYaw;
-            GlStateManager.translate(0.0F, 0.0F, 0.0F);
+
+            //entity.rotationYawHead = entity.prevRotationYawHead = entity.rotationYaw = entity.renderYawOffset = -180 + rotation * 360;
+
             RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
-            rendermanager.setPlayerViewY(180.0F);
             rendermanager.setRenderShadow(false);
-
-            rendermanager.renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
-
+            rendermanager.renderEntity(entity, 0.0D, 0.0D, 0.0D, 0, 1.0F, false);
             rendermanager.setRenderShadow(true);
-            entity.renderYawOffset = f;
-            entity.rotationYaw = f1;
-            entity.rotationPitch = f2;
-            entity.prevRotationYawHead = f3;
-            entity.rotationYawHead = f4;
+
             GlStateManager.popMatrix();
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableRescaleNormal();
             GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-            GlStateManager.disableTexture2D();
             GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
         }
+
 
     }
 

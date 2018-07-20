@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class WidgetModifierRotate extends WidgetModifier implements IEasing {
 	private float deg, x, y, z;
-	private float DEG, X, Y, Z;
+	public float DEG, X, Y, Z;
 
 	private ArrayList<ArrayList> easingListX, easingListY, easingListZ, easingListDeg;
 
