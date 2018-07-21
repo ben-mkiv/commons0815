@@ -23,10 +23,17 @@ public class HotkeyEntityEvent extends hotkeyEvent {
 
     @Override
     public boolean canExecute(EntityPlayer player){
-        if(targetEntity == null)
+        if(targetEntity == null){
+            player.sendStatusMessage(new TextComponentString("couldnt find target entity"), true);
             return false;
+        }
 
         Entity target = getEntity();
+
+        if(target == null) {
+            player.sendStatusMessage(new TextComponentString("couldnt find target entity"), true);
+            return false;
+        }
 
         if(target.equals(player))
             return super.canExecute(player);
