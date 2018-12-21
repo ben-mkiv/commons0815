@@ -73,4 +73,13 @@ public class guiHandler {
         return null;
     }
 
+    public static String getClassNameClient(int id){
+        for(GUIScreen screen : screens.values())
+            if(screen.index == id)
+                return screen.clientClassname;
+
+        return "";
+    }
+
+
 }

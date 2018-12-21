@@ -33,7 +33,7 @@ public abstract class TextBufferGUI {
 
         renderWidth = getRenderWidth(Integer.MAX_VALUE);
         renderHeight = getRenderHeight(Math.round(renderWidth));
-        background.setSize(width + 2*padding, renderHeight + 2*padding);
+        background.setSize(renderWidth + 2*padding, renderHeight + 2*padding);
         scaleToWidth = getRenderScale(width);
 
         //Minecraft.getMinecraft().entityRenderer.disableLightmap();
@@ -66,10 +66,12 @@ public abstract class TextBufferGUI {
     }
 
     public int getRenderWidth(int maxWidth){
-        return Math.min(maxWidth, TextBufferRenderCache.renderer().charRenderWidth() * this.get().getWidth());
+        int w = Math.min(maxWidth, TextBufferRenderCache.renderer().charRenderWidth() * this.get().getWidth());
+        return w;
     }
 
     public int getRenderHeight(int maxWidth){
-        return Math.round(getRenderScale(maxWidth) * TextBufferRenderCache.renderer().charRenderHeight() * this.get().getHeight());
+        int h = Math.round(getRenderScale(maxWidth) * TextBufferRenderCache.renderer().charRenderHeight() * this.get().getHeight());
+        return h;
     }
 }

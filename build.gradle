@@ -36,7 +36,7 @@ minecraft {
     replace "@VERSION@", simpleVersion
 
     runDir = "run"
-    version = "14.23.3.2655"
+    version = "14.23.4.2718"
     mappings = "snapshot_20180502"
 }
 
