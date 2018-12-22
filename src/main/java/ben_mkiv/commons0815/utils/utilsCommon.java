@@ -197,4 +197,15 @@ public class utilsCommon {
 		return player.isSneaking() ? player : Minecraft.getMinecraft().objectMouseOver.entityHit;
 	}
 
+	@SideOnly(Side.CLIENT)
+	public static TileEntity getFocusedTileEntity() {
+		if (Minecraft.getMinecraft().objectMouseOver == null)
+			return null;
+
+		if(!Minecraft.getMinecraft().objectMouseOver.typeOfHit.equals(RayTraceResult.Type.BLOCK))
+			return null;
+
+		return Minecraft.getMinecraft().player.world.getTileEntity(Minecraft.getMinecraft().objectMouseOver.getBlockPos());
+	}
+
 }
