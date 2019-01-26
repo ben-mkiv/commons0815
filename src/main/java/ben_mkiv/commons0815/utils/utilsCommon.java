@@ -2,7 +2,6 @@ package ben_mkiv.commons0815.utils;
 
 import com.google.common.base.Charsets;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -25,9 +24,26 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class utilsCommon {
 	private static HashMap<String, Long> cooldownTimer = new HashMap<>();
+
+	public static Entity getEntityByUUID(World world, UUID uuid){
+		for(Entity ent : world.getLoadedEntityList())
+			if(ent.getUniqueID().equals(uuid))
+				return ent;
+
+		return null;
+	}
+
+	public static Entity getEntityByUUID(UUID uuid){
+		if(FMLCommonHandler.instance().getEffectiveSide().equals(Side.SERVER))
+			return FMLCommonHandler.instance().getMinecraftServerInstance().getEntityFromUuid(uuid);
+		else
+			return getEntityByUUID(net.minecraft.client.Minecraft.getMinecraft().world, uuid);
+	}
+
 
 	public static ArrayList<BlockPos> getSquareOffsets(int radius){
 		ArrayList<BlockPos> list = new ArrayList();
@@ -64,7 +80,7 @@ public class utilsCommon {
 
 	@SideOnly(Side.CLIENT)
 	public static boolean checkCooldown(String identifier, long cooldownTime){
-		long timenow = Minecraft.getSystemTime();
+		long timenow = net.minecraft.client.Minecraft.getSystemTime();
 
 		long timeout = 0;
 		if(cooldownTimer.get(identifier) != null)
@@ -175,7 +191,7 @@ public class utilsCommon {
 
 	@SideOnly(Side.CLIENT)
 	public static Entity getEntityLookingAt(){
-		RayTraceResult objectMouseOver = Minecraft.getMinecraft().player.rayTrace(128, 1);
+		RayTraceResult objectMouseOver = net.minecraft.client.Minecraft.getMinecraft().player.rayTrace(128, 1);
 		if(objectMouseOver != null && objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY){
 			return objectMouseOver.entityHit;
 		}
@@ -193,19 +209,20 @@ public class utilsCommon {
 
 	@SideOnly(Side.CLIENT)
 	public static Entity getFocusedEntity(){
-		EntityPlayer player = Minecraft.getMinecraft().player;
-		return player.isSneaking() ? player : Minecraft.getMinecraft().objectMouseOver.entityHit;
+		EntityPlayer player = net.minecraft.client.Minecraft.getMinecraft().player;
+		return player.isSneaking() ? player : net.minecraft.client.Minecraft.getMinecraft().objectMouseOver.entityHit;
 	}
 
 	@SideOnly(Side.CLIENT)
 	public static TileEntity getFocusedTileEntity() {
-		if (Minecraft.getMinecraft().objectMouseOver == null)
+		net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getMinecraft();
+		if (mc.objectMouseOver == null)
 			return null;
 
-		if(!Minecraft.getMinecraft().objectMouseOver.typeOfHit.equals(RayTraceResult.Type.BLOCK))
+		if(!mc.getMinecraft().objectMouseOver.typeOfHit.equals(RayTraceResult.Type.BLOCK))
 			return null;
 
-		return Minecraft.getMinecraft().player.world.getTileEntity(Minecraft.getMinecraft().objectMouseOver.getBlockPos());
+		return mc.getMinecraft().player.world.getTileEntity(mc.getMinecraft().objectMouseOver.getBlockPos());
 	}
 
 }

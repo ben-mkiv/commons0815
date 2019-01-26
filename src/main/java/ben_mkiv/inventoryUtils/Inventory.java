@@ -115,8 +115,9 @@ public abstract class Inventory extends ItemStackHandler implements IItemHandler
 
         if(slotCount < this.stacks.size() && !entity.world.isRemote){
             ArrayList<ItemStack> dropItems = new ArrayList<>();
-            for(int i = slotCount;  i < this.getSizeInventory(); i++)
+            for(int i = slotCount;  i < this.getSizeInventory(); i++) {
                 dropItems.add(getStackInSlot(i).copy());
+            }
 
             ItemUtil.dropItemList(dropItems, entity.world, entity.getPosition(), false);
         }
