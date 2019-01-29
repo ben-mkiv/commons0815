@@ -1,6 +1,7 @@
 package ben_mkiv.rendertoolkit.common.widgets.core.modifiers;
 
 import ben_mkiv.rendertoolkit.surface.ClientSurface;
+import ben_mkiv.rendertoolkit.common.widgets.WidgetModifier;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -10,7 +11,7 @@ public class WidgetModifierAutoTranslate extends WidgetModifierTranslate {
     }
 
     public WidgetModifierType getType(){
-        return WidgetModifierType.AUTOTRANSLATE;
+        return WidgetModifier.WidgetModifierType.AUTOTRANSLATE;
     }
 
     @Override

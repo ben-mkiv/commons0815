@@ -2,6 +2,7 @@ package ben_mkiv.rendertoolkit.common.widgets.core;
 
 import ben_mkiv.commons0815.penner.easing.*;
 import io.netty.buffer.ByteBuf;
+
 import java.util.ArrayList;
 
 public class Easing{
@@ -84,7 +85,7 @@ public class Easing{
                 return 0;
         }
     }
-        
+
     public static float easeOut(float currentTime, float totalTime, float min, float max, EasingType easingType){
         switch(easingType) {
             case BACK:
@@ -184,7 +185,7 @@ public class Easing{
     public static void writeEasing(ByteBuf buff, ArrayList list){
         buff.writeInt(list.size());
         if(list.size() == 0) return;
-        
+
         buff.writeInt(((Easing.EasingType) list.get(0)).ordinal());
         buff.writeInt(((Easing.EasingTypeIO) list.get(1)).ordinal());
         buff.writeFloat((float) list.get(2));

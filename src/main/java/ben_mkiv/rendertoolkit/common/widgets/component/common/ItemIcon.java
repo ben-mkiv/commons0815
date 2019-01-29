@@ -6,8 +6,9 @@ import ben_mkiv.rendertoolkit.common.widgets.WidgetGLWorld;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IItem;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -22,7 +23,6 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
@@ -75,67 +75,73 @@ public abstract class ItemIcon extends WidgetGLWorld implements IItem {
         return new RenderableItemIcon();
     }
 
-    public class RenderableItemIcon extends RenderableGLWidget{
+    private class RenderableItemIcon extends RenderableGLWidget{
         @Override
-        public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
+        public void render(EntityPlayer player, Vec3d location, long conditionStates) {
             if(itmStack == null) return;
             if(ibakedmodel == null) ibakedmodel = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(itmStack);
 
-            Minecraft mc = Minecraft.getMinecraft();
-            TextureManager tm = mc.getTextureManager();
+            TextureManager tm = Minecraft.getMinecraft().getTextureManager();
 
             tm.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             tm.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
 
-            int alphaColor = this.preRender(conditionStates, renderOffset);
+
+            GlStateManager.translate(location.x, location.y, location.z);
+
+            int alphaColor = this.preRender(conditionStates);
+
             this.applyModifiers(conditionStates);
 
             if(rendertype == RenderType.WorldLocated) {
-                GL11.glTranslatef(0.5F, 0.5F, 0.5F);
-                GL11.glRotated(180D, 0, 1D, 0D);
+                GlStateManager.translate(0.5F, 0.5F, 0.5F);
+                GlStateManager.rotate(180, 0, 1, 0);
                 if(faceWidgetToPlayer) {
-                    GL11.glRotated(player.rotationYaw, 0.0D, -1.0D, 0.0D);
-                    GL11.glRotated(180D, 0, 1D, 0D);
-                    GL11.glRotated(player.rotationPitch, 1.0D, 0.0D, 0.0D);
-                    GL11.glRotated(180D, 0, 1D, 0D);
+                    GlStateManager.rotate(player.rotationYaw, 0, -1, 0);
+                    GlStateManager.rotate(180, 0, 1, 0);
+                    GlStateManager.rotate(player.rotationPitch, 1, 0, 0);
+                    GlStateManager.rotate(180, 0, 1, 0);
                 }
-                GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
             }
             else {
                 this.applyAlignments();
-                GL11.glTranslatef(0F, 1F, 0F);
-                GL11.glRotated(180, 1, 0, 0);
+                GlStateManager.translate(0F, 1F, 0F);
+                GlStateManager.rotate(180, 0, 0, 1);
+                GlStateManager.scale(-1, 1, 1);
             }
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder vertexbuffer = tessellator.getBuffer();
             vertexbuffer.begin(7, DefaultVertexFormats.ITEM);
-            EnumFacing[] var6 = EnumFacing.values();
 
-            for (int var8 = 0, var7 = var6.length; var8 < var7; ++var8)
-                renderQuads(vertexbuffer, ibakedmodel.getQuads(null, var6[var8], 0L), alphaColor);
+            for(EnumFacing facing : EnumFacing.values())
+                renderQuads(vertexbuffer, ibakedmodel.getQuads(null, facing, 0L), alphaColor);
 
             renderQuads(vertexbuffer, ibakedmodel.getQuads(null, null, 0L), alphaColor);
             tessellator.draw();
+
+
+            Minecraft.getMinecraft().fontRenderer.drawString("meow", 0, 0, 0xFFFFFF);
             this.postRender();
         }
 
         private void applyAlignments(){
             switch(this.getHorizontalAlign()) {
                 case CENTER:
-                    GL11.glTranslatef(-0.5F, 0F, 0F);
+                    GlStateManager.translate(-0.5F, 0F, 0F);
                     break;
-                case RIGHT:
-                    GL11.glTranslatef(-1F, 0F, 0F);
+                case LEFT:
+                    GlStateManager.translate(-1F, 0F, 0F);
                     break;
             }
 
             switch(this.getVerticalAlign()) {
                 case MIDDLE:
-                    GL11.glTranslatef(0F, -0.5F, 0F);
+                    GlStateManager.translate(0F, -0.5F, 0F);
                     break;
-                case BOTTOM:
-                    GL11.glTranslatef(0F, -1F, 0F);
+                case TOP:
+                    GlStateManager.translate(0F, -1F, 0F);
                     break;
             }
         }

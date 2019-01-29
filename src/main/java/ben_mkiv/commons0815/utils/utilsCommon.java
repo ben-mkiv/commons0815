@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -147,7 +148,8 @@ public class utilsCommon {
 
 	public static int getIntFromColor(float red, float green, float blue, float alpha){
 	    Color col = new Color(red, green, blue, alpha);
-	    return col.getRGB();
+	    int val = col.getRGB();
+	    return val;
 	}
 
 	public static int getIntFromColor(float color[], float alpha){
@@ -178,6 +180,10 @@ public class utilsCommon {
 	
 	public static boolean inRange(Entity player, double sx, double sy, double sz, double r){
 		return inRange(player.posX, player.posY, player.posZ, sx, sy, sz, r);
+	}
+
+	public static boolean inRange(Entity player, Vec3d pos, double r){
+		return inRange(player.posX, player.posY, player.posZ, pos.x, pos.y, pos.z, r);
 	}
 	
 	public static boolean isLookingAt(RayTraceResult pos, float[] target){
@@ -224,5 +230,18 @@ public class utilsCommon {
 
 		return mc.getMinecraft().player.world.getTileEntity(mc.getMinecraft().objectMouseOver.getBlockPos());
 	}
+
+	public static int getLightLevelPlayer(EntityPlayer e){
+		return e.world.getLightFor(EnumSkyBlock.SKY, new BlockPos(e.posX, e.posY + 1, e.posZ));
+	}
+
+	public static boolean isPlayerSwimming(EntityPlayer e){
+		if(e.world.getBlockState(new BlockPos(e.posX, e.posY, e.posZ)).getMaterial().isLiquid()
+				|| e.world.getBlockState(new BlockPos(e.posX, e.posY+1, e.posZ)).getMaterial().isLiquid())
+			return true;
+
+		return false;
+	}
+
 
 }

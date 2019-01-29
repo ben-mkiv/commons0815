@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled; 
+import io.netty.buffer.Unpooled;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.UsernameCache;
@@ -46,9 +46,7 @@ public abstract class Widget implements IAttribute{
 		return -1;
 	}
 
-	public int getType(){
-		return getType(this.getClass());
-	}
+	public abstract WidgetType getType();
 
 	public static Object[] getTypes(){
 		ArrayList<String> list = new ArrayList();
@@ -77,31 +75,31 @@ public abstract class Widget implements IAttribute{
 
 
 	public WidgetModifiers WidgetModifierList = new WidgetModifiers();
-	
+
 	public abstract void writeData(ByteBuf buff);
 
 	public abstract void readData(ByteBuf buff);
-	
+
 	public UUID string2UUID(String input){
 		try {
 			return UUID.fromString(input);
 		} catch (Exception ex) { return null; }
 	}
-	
+
 	public final void write(ByteBuf buff){
 		buff.writeBoolean(this.isVisible);
-		
+
 		if(this.widgetOwner != null)
 			ByteBufUtils.writeUTF8String(buff, this.widgetOwner.toString());
 		else
 			ByteBufUtils.writeUTF8String(buff, "@NONE");
-			
+
 		writeData(buff);
 	}
 
 	public final void read(ByteBuf buff){
 		this.isVisible = buff.readBoolean();
-		this.widgetOwner = string2UUID(ByteBufUtils.readUTF8String(buff));			
+		this.widgetOwner = string2UUID(ByteBufUtils.readUTF8String(buff));
 		readData(buff);
 	}
 
@@ -122,26 +120,26 @@ public abstract class Widget implements IAttribute{
 
 	@SideOnly(Side.CLIENT)
 	public abstract IRenderableWidget getRenderable();
-	
+
 	public boolean isVisible() {
 		return isVisible;
 	}
-	
+
 	public void setVisible(boolean isVisible) {
 		this.isVisible = isVisible;
 	}
-	
+
 	public UUID getOwnerUUID() {
 		return this.widgetOwner;
 	}
-	
+
 	public String getOwner() {
 		if(this.widgetOwner != null)
 			return UsernameCache.getLastKnownUsername(this.widgetOwner);
 		else
 			return "";
 	}
-	
+
 	//sets widget owner and returns the uuid
 	public UUID setOwner(String playerName) {
 		if(playerName.length() == 0)
@@ -151,7 +149,7 @@ public abstract class Widget implements IAttribute{
 			if (newOwner != null)
 				this.widgetOwner = newOwner.getGameProfile().getId();
 		}
-		
+
 		return this.getOwnerUUID();
 	}
 }

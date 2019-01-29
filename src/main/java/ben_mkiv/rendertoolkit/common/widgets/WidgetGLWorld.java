@@ -1,14 +1,13 @@
 package ben_mkiv.rendertoolkit.common.widgets;
 
+import ben_mkiv.rendertoolkit.common.widgets.core.attribute.ILookable;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IThroughVisibility;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IViewDistance;
-import ben_mkiv.rendertoolkit.common.widgets.core.attribute.ILookable;
-
 import io.netty.buffer.ByteBuf;
 
-public abstract class WidgetGLWorld extends WidgetGLOverlay implements IThroughVisibility, IViewDistance, ILookable{
+public abstract class WidgetGLWorld extends WidgetGLOverlay implements IThroughVisibility, IViewDistance, ILookable {
 	public WidgetGLWorld(){
-		this.rendertype = RenderType.WorldLocated;
+		this.rendertype = RenderType.WorldLocated; 
 	}
 
 	public void writeData(ByteBuf buff){
@@ -19,7 +18,7 @@ public abstract class WidgetGLWorld extends WidgetGLOverlay implements IThroughV
 	
 	public void readData(ByteBuf buff){
 		super.readData(buff);
-		isThroughVisibility = buff.readBoolean();		
+		isThroughVisibility = buff.readBoolean();
 		faceWidgetToPlayer = buff.readBoolean();
 	}
 	

@@ -3,13 +3,16 @@ package ben_mkiv.rendertoolkit.common.widgets.component.world;
 import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetModifier;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetModifierConditionType;
+import ben_mkiv.rendertoolkit.common.widgets.WidgetType;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.ITracker;
+import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,13 +28,12 @@ import org.lwjgl.opengl.GL11;
 import java.util.ArrayList;
 import java.util.UUID;
 
-
 public class EntityTracker3D extends OBJModel3D implements ITracker {
     public enum EntityType{ NONE, ALL, ITEM, LIVING, PLAYER, HOSTILE, NEUTRAL, UNIQUE }
     static ArrayList<WidgetModifier.WidgetModifierType> applyModifiersList;
 
     public int maximumRange = 128;
-    public int trackingRange = 32;
+    public int trackingRange = 0;
     public EntityType trackingType;
     public String trackingEntityName = "";
     public int trackingEntityMetaIndex = 0;
@@ -65,17 +67,16 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
     @Override
     public void readData(ByteBuf buff) {
         super.readData(buff);
-
-        //todo: fix (failed after outsourcing)
-        //trackingRange = Math.min(ClientSurface.instances.glassesStack.getTagCompound().getInteger("radarRange"), buff.readInt());
+        trackingRange = Math.min(ClientSurface.instances.maxTrackingRange, buff.readInt());
         setupTracking(buff.readInt(), trackingRange);
         setupTrackingFilter(ByteBufUtils.readUTF8String(buff), buff.readInt());
 
-        try {
-            setupTrackingEntity(UUID.fromString(ByteBufUtils.readUTF8String(buff)));
-        } catch (Exception e) {
+        String uuid = ByteBufUtils.readUTF8String(buff);
+
+        if(!uuid.equals("none"))
+            setupTrackingEntity(UUID.fromString(uuid));
+        else
             setupTrackingEntity(null);
-        }
     }
 
     public void setupTracking(int tT, int range) {
@@ -98,12 +99,17 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
 
 
     public ArrayList getAllEntities(Vec3d origin, int distance, World world, Class<? extends Entity> eClass, AxisAlignedBB bounds){
-        ArrayList<Entity> entities = new ArrayList<>();
+        ArrayList entities = new ArrayList();
         for(Entity entity : world.getEntitiesWithinAABB(eClass, bounds)) {
             if(checkDistance(origin, new Vec3d(entity.posX, entity.posY, entity.posZ), distance))
                 entities.add(entity);
         }
         return entities;
+    }
+
+    @Override
+    public WidgetType getType() {
+        return WidgetType.ENTITYTRACKER3D;
     }
 
     @SideOnly(Side.CLIENT)
@@ -112,22 +118,14 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
         return new RenderEntityTracker();
     }
 
-    public boolean shouldRenderStart(){
-        if(objFile == null)
-            return false;
-
-
-
-
-        return true;
-    }
-
     @SideOnly(Side.CLIENT)
     class RenderEntityTracker extends RenderableOBJModel{
         @Override
-        public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
-            if(!shouldRenderStart())
-                return;
+        public void render(EntityPlayer player, Vec3d location, long conditionStates) {
+            if(objFile == null) return;
+            if(!ClientSurface.instances.entityTrackerEnabled) return;    //require Geolyzer Update
+
+
 
             if(trackingType.equals(EntityType.NONE)) return;
 
@@ -144,9 +142,9 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
             AxisAlignedBB bounds = new AxisAlignedBB(playerPos.x - trackingRange, playerPos.y - trackingRange, playerPos.z - trackingRange,
                                                      playerPos.x + trackingRange, playerPos.y + trackingRange, playerPos.z + trackingRange);
 
-            GL11.glTranslated(-renderOffset.x, -renderOffset.y, -renderOffset.z);
-            //GL11.glLoadMatrix();
-            this.preRender(conditionStates, renderOffset);
+            GL11.glTranslated(-location.x, -location.y, -location.z);
+
+            this.preRender(conditionStates);
 
             TESR = Tessellator.getInstance();
             buffer = TESR.getBuffer();
@@ -167,7 +165,8 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                         if (!checkRender(e)) continue;
                         if (e == player) continue;
                         renderTarget(e.getPositionVector(), player, customRenderConditions(conditionStates, e, focusedEntity));
-            }   }
+                    }
+            }
 
             switch(trackingType) {
                 case ALL:
@@ -180,7 +179,6 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
             }   }
 
             this.postRender();
-            GL11.glTranslated(renderOffset.x, renderOffset.y, renderOffset.z);
         }
 
         public long customRenderConditions(long customConditions, Entity e, Entity focusedEntity){
@@ -190,10 +188,10 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
             if(e instanceof EntityMob)
                 customConditions |= ((long) 1 << WidgetModifierConditionType.IS_HOSTILE);
 
-            if(!(e instanceof EntityMob) && (e instanceof EntityLiving))
+            if(!(e instanceof EntityMob) && (e instanceof EntityLivingBase))
                 customConditions |= ((long) 1 << WidgetModifierConditionType.IS_NEUTRAL);
 
-            if(e instanceof EntityLiving)
+            if(e instanceof EntityLivingBase)
                 customConditions |= ((long) 1 << WidgetModifierConditionType.IS_LIVING);
 
             if(e instanceof EntityItem)
@@ -221,38 +219,30 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                     if(!(e instanceof EntityMob))
                         return false;
 
-                    if(trackingEntityName.length() == 0)
-                        return true;
-
-                    if(!e.getName().toLowerCase().equals(trackingEntityName))
-                        return false;
+                    if(trackingEntityName.length() > 0)
+                        return e.getName().toLowerCase().equals(trackingEntityName);
 
                     return true;
 
+                case PLAYER:
                 case LIVING:
-                    if(!(e instanceof EntityLiving))
+                    if(!(e instanceof EntityLivingBase))
                         return false;
 
-                    if(trackingEntityName.length() == 0)
-                        return true;
-
-                    if(!e.getName().toLowerCase().equals(trackingEntityName))
-                        return false;
+                    if(trackingEntityName.length() > 0)
+                        return e.getName().toLowerCase().equals(trackingEntityName);
 
                     return true;
 
                 case NEUTRAL:
-                    if(!(e instanceof EntityLiving))
+                    if(!(e instanceof EntityLivingBase))
                         return false;
 
                     if(e instanceof EntityMob)
                         return false;
 
-                    if(trackingEntityName.length() == 0)
-                        return true;
-
-                    if(!e.getName().toLowerCase().equals(trackingEntityName))
-                        return false;
+                    if(trackingEntityName.length() > 0)
+                        return e.getName().toLowerCase().equals(trackingEntityName);
 
                     return true;
 
@@ -277,6 +267,7 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
         }
 
         public void renderTarget(Vec3d pos, EntityPlayer player, long conditionStates) {
+            GlStateManager.pushMatrix();
             GL11.glTranslated(pos.x, pos.y, pos.z);
 
             this.applyModifierList(conditionStates, applyModifiersList);
@@ -296,9 +287,7 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                 TESR.draw();
             }
             this.removePlayerRotation(player, pos);
-            this.revokeModifierList(applyModifiersList);
-
-            GL11.glTranslated(-pos.x, -pos.y, -pos.z);
+            GlStateManager.popMatrix();
         }
     }
 

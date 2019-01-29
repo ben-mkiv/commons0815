@@ -24,7 +24,13 @@ package ben_mkiv.rendertoolkit.common.widgets.component.wavefrontObj;
  * THE SOFTWARE.
  */
 
-import java.io.*;
+import ben_mkiv.rendertoolkit.renderToolkit;
+import com.google.common.collect.Maps;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +38,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import ben_mkiv.rendertoolkit.renderToolkit;
-import com.google.common.collect.Maps;
 
 
 /**
@@ -282,7 +285,7 @@ public class objParser
             faces.clear();
         }
 
-        if (!data.equals(""))
+        if (data != "")
             currentShape = data.indexOf('_') != -1 ? data.substring(0, data.indexOf('_')) : data;
     }
 

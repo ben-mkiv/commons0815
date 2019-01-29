@@ -81,7 +81,7 @@ public class WidgetUpdatePacket  implements IMessage {
             case AddWigets:
                 buf.writeInt(widgetList.size());
                 for(Map.Entry<Integer, Widget> w : widgetList.entrySet()){
-                    buf.writeInt(w.getValue().getType());
+                    buf.writeInt(w.getValue().getType().ordinal());
                     w.getValue().write(buf);
                     buf.writeInt(w.getKey());
                 }

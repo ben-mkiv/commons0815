@@ -1,63 +1,49 @@
 package ben_mkiv.rendertoolkit.common.widgets;
 
-import ben_mkiv.commons0815.utils.PlayerStats;
 import ben_mkiv.commons0815.utils.utilsCommon;
-import ben_mkiv.rendertoolkit.common.widgets.component.common.EntityWidget;
-import ben_mkiv.rendertoolkit.common.widgets.component.common.FluidWidget;
-import ben_mkiv.rendertoolkit.common.widgets.component.common.ItemIcon;
-import ben_mkiv.rendertoolkit.common.widgets.component.face.Box2D;
-import ben_mkiv.rendertoolkit.common.widgets.component.face.Text2D;
-import ben_mkiv.rendertoolkit.common.widgets.component.world.Text3D;
-import ben_mkiv.commons0815.utils.ClientUtils;
-import ben_mkiv.rendertoolkit.renderToolkit;
+import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IPrivate;
+import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IResizable;
 import ben_mkiv.rendertoolkit.surface.ClientSurface;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
-import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IResizable;
-import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IPrivate;
-
-import net.minecraft.entity.player.EntityPlayer;
-
-import net.minecraft.util.math.RayTraceResult;
-
-import io.netty.buffer.ByteBuf;
-
+import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import org.lwjgl.opengl.GL11;
 
 public abstract class WidgetGLOverlay extends Widget implements IResizable, IPrivate {
-	public RenderType rendertype;
+	public RenderType rendertype = RenderType.GameOverlayLocated;
 
-	private float x = 0, y = 0, z = 0;
-	private Vec3d margin = new Vec3d(0, 0, 0);
+	private Vector3f pos = new Vector3f(0, 0, 0);
+	private Vector3f margin = new Vector3f(0, 0, 0);
 
-	public float width = 1, height = 1; //default to one, so that stuff appears even without setting size
+	public float width = 1, height = 1;
 
 	public enum VAlignment{	TOP, MIDDLE, BOTTOM }
 	public enum HAlignment{	LEFT, CENTER, RIGHT }
 
-	public VAlignment valign;
-	public HAlignment halign;
+	public VAlignment valign = VAlignment.BOTTOM;
+	public HAlignment halign = HAlignment.RIGHT;
 
 	public boolean isThroughVisibility = false;
 	public boolean isLookingAtEnable = false;
 	public boolean faceWidgetToPlayer = false;
 
 	public Vec3d lookAt = new Vec3d(0, 0, 0);
-	
+
 	public int viewDistance = 64;
 
 	public long age = 0;
 
-	public WidgetGLOverlay(){
-		this.valign = VAlignment.TOP;
-		this.halign = HAlignment.LEFT;
-		this.rendertype = RenderType.GameOverlayLocated;
-	}
+	public WidgetGLOverlay(){}
 	
 	public void writeData(ByteBuf buff) {
 		WidgetModifierList.writeData(buff);
@@ -65,9 +51,9 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 		buff.writeDouble(lookAt.x);
 		buff.writeDouble(lookAt.y);
 		buff.writeDouble(lookAt.z);
-		buff.writeFloat(x);
-		buff.writeFloat(y);
-		buff.writeFloat(z);
+		buff.writeFloat(pos.x);
+		buff.writeFloat(pos.y);
+		buff.writeFloat(pos.z);
 		buff.writeInt(valign.ordinal());
 		buff.writeInt(halign.ordinal());
 		buff.writeBoolean(isLookingAtEnable);
@@ -77,9 +63,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 		WidgetModifierList.readData(buff);
 		viewDistance = buff.readInt();
 		lookAt = new Vec3d(buff.readDouble(), buff.readDouble(), buff.readDouble());
-		x = buff.readFloat();
-		y = buff.readFloat();
-		z = buff.readFloat();
+		pos = new Vector3f(buff.readFloat(), buff.readFloat(), buff.readFloat());
 		valign = VAlignment.values()[buff.readInt()];
 		halign = HAlignment.values()[buff.readInt()];
 		isLookingAtEnable = buff.readBoolean();
@@ -141,102 +125,106 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 		this.halign = HAlignment.valueOf(align.toUpperCase());
 	}
 
-	public Vec3d getRenderPosition(String playerName, Vec3d offset, long conditions){
-		PlayerStats s = renderToolkit.proxy.getPlayerStats(playerName);
-		offset.add(this.WidgetModifierList.getRenderPosition(conditions, offset, s.screenWidth, s.screenHeight, 0));
-		return new Vec3d(offset.x+margin.x, offset.y+margin.y, offset.z+margin.z);
-	}
-
 	@SideOnly(Side.CLIENT)
-	public class RenderableGLWidget implements IRenderableWidget {
-		boolean depthtest, texture2d, blending, smoothshading, alpha;
+	public class RenderableGLWidget implements IRenderableWidget {		
 		boolean doBlending, doTexture, doSmoothShade, doAlpha;
-		boolean renderPositionSet = false;
-
 		@Override
-		public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {}
+		public void render(EntityPlayer player, Vec3d location, long conditionStates) {}
 
 		public void setRenderFlags() {
-			depthtest = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
-			texture2d = GL11.glIsEnabled(GL11.GL_TEXTURE_2D);
-			blending = GL11.glIsEnabled(GL11.GL_BLEND);
-
-			smoothshading = false;
 			doBlending = false;
 			doTexture = false;
 			doSmoothShade = false;
 
-			if(GL11.glGetInteger(GL11.GL_SHADE_MODEL) == GL11.GL_SMOOTH)
-				smoothshading = true;
-
 			if(isThroughVisibility)
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
+				GlStateManager.disableDepth();
 			else
-				GL11.glEnable(GL11.GL_DEPTH_TEST);
+				GlStateManager.enableDepth();
 
-			GL11.glDisable(GL11.GL_LIGHTING);
+			GlStateManager.disableLighting();
 
-			for(int i=0, count = WidgetModifierList.modifiers.size(); i < count; i++){
-				switch(WidgetModifierList.modifiers.get(i).getType()){
-					case COLOR: if((float) WidgetModifierList.modifiers.get(i).getValues()[3] < 1) doBlending = true; break;
-					case TEXTURE: doTexture = true; break;
-					default: break;
+			for(WidgetModifier modifier : WidgetModifierList.modifiers){
+				switch(modifier.getType()){
+					case COLOR:
+						if((float) modifier.getValues()[3] == 1)
+							continue;
+						doAlpha = true;
+						doBlending = true;
+						GlStateManager.enableDepth();
+						GlStateManager.depthMask(true);
+						continue;
+					case TEXTURE:
+						doTexture = true;
+						continue;
 				}
 			}
 
-			Class type = getClass();
-			if(type.equals(Box2D.RenderableBox2DWidget.class)){
-				doSmoothShade = true;
-				doBlending = true;
-				doAlpha = true;
-				//doTexture = false;
-			}
-			else if(type.equals(Text2D.RenderText.class) || type.equals(Text3D.RenderableFloatingText.class)){
-				doTexture = true;
-				doBlending = true;
-				GL11.glDisable(GL11.GL_ALPHA_TEST);
-			}
-			else if(type.equals(ItemIcon.RenderableItemIcon.class) || type.equals(EntityWidget.RenderableEntity.class) || type.equals(FluidWidget.RenderableFluidIcon.class)){
-				doBlending = true;
-				doTexture = true;
+			switch(getType()){
+				case BOX2D:
+					doAlpha = true;
+					doBlending = true;
+					doSmoothShade = true;
+					//doTexture = false;
+					break;
+
+				case TEXT2D:
+				case TEXT3D:
+					doAlpha = true;
+					doBlending = true;
+					doTexture = true;
+					break;
+
+				case FLUID2D:
+				case ENTITY2D:
+				case ITEM2D:
+					GlStateManager.enableDepth();
+					GlStateManager.depthMask(true);
+				case ITEM3D:
+					doAlpha = true;
+					doBlending = true;
+					doTexture = true;
+					break;
 			}
 
 			if(doTexture)
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
+				GlStateManager.enableTexture2D();
 			else
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
+				GlStateManager.disableTexture2D();
 
 			if(doBlending){
-				GL11.glEnable(GL11.GL_BLEND);		//vertex based alpha
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+				GlStateManager.enableBlend();
+				GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			}
 			else {
-				GL11.glDisable(GL11.GL_BLEND);
+				GlStateManager.disableBlend();
 			}
 			if(doSmoothShade)
-				GL11.glShadeModel(GL11.GL_SMOOTH);
+				GlStateManager.shadeModel(GL11.GL_SMOOTH);
 			else
-				GL11.glShadeModel(GL11.GL_FLAT);
+				GlStateManager.shadeModel(GL11.GL_FLAT);
+
+			if(doAlpha)
+				GlStateManager.enableAlpha();
+			else
+				GlStateManager.disableAlpha();
 		}
 
 
-		public int preRender(long conditionStates, Vec3d renderOffset){
+		public int preRender(long conditionStates){
 			age++;
 			this.setRenderFlags();
-			if(age % 50 == 0){
-				updateRenderPosition(conditionStates, renderOffset);
-				age = 1;
-			}
+			if(age % 50 == 0) updateRenderPosition(conditionStates);
 			return WidgetModifierList.getCurrentColor(conditionStates, 0);
 		}
 
-		public void updateRenderPosition(long conditionStates, Vec3d renderOffset){
-			Vec3d renderOrigin = renderOffset;
+		public void updateRenderPosition(long conditionStates){
+			updateRenderPosition(conditionStates, new Vec3d(0, 0, 0));
+		}
+
+		public void updateRenderPosition(long conditionStates, Vec3d renderOrigin){
 			Vec3d renderPosition = WidgetModifierList.getRenderPosition(conditionStates, renderOrigin, ClientSurface.resolution.getScaledWidth(), ClientSurface.resolution.getScaledHeight(), 1);
-			x = (float) (renderPosition.x + margin.x);
-			y = (float) (renderPosition.y + margin.y);
-			z = (float) (renderPosition.z + margin.z);
-			renderPositionSet = true;
+			pos = new Vector3f((float) renderPosition.x, (float) renderPosition.y, (float) renderPosition.z);
+			pos.add(margin);
 		}
 
 		public int applyModifiers(long conditionStates){
@@ -247,14 +235,14 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 
 		public void addPlayerRotation(EntityPlayer player){
 			if(!faceWidgetToPlayer) return;
-			if(player == null) player = renderToolkit.proxy.getPlayer("");
+
 			GL11.glRotated(player.rotationYaw,0.0D,1.0D,0.0D);
 			GL11.glRotated(-player.rotationPitch,1.0D,0.0D,0.0D);
 		}
 
 		public void removePlayerRotation(EntityPlayer player){
 			if(!faceWidgetToPlayer) return;
-			if(player == null) player = renderToolkit.proxy.getPlayer("");
+
 			GL11.glRotated(player.rotationPitch,1.0D,0.0D,0.0D);
 			GL11.glRotated(-player.rotationYaw,0.0D,1.0D,0.0D);
 		}
@@ -303,39 +291,26 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 			return WidgetModifierList.getCurrentColorFloat(conditionStates, index);
 		}
 
-		public void postRender(){
-			revokeModifiers();
-			revokeRenderFlags();
-		}
+		public void postRender(){}
 
-		public void revokeRenderFlags(){
-			if(depthtest) 
-				GL11.glEnable(GL11.GL_DEPTH_TEST);
-			else
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
-			if(blending) 
-				GL11.glEnable(GL11.GL_BLEND);
-			else
-				GL11.glDisable(GL11.GL_BLEND);
-				
-			if(texture2d) 
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
-			else
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
-				
-			if(smoothshading)
-				GL11.glShadeModel(GL11.GL_SMOOTH);
-			else 
-				GL11.glShadeModel(GL11.GL_FLAT);
-		}
-				
+
 		@Override
 		public boolean shouldWidgetBeRendered(EntityPlayer player) {
-			if(getRenderType().equals(RenderType.WorldLocated))
-				if (renderPositionSet && !utilsCommon.inRange(player, x, y, z, viewDistance))
-					return false;
+			return shouldWidgetBeRendered(player, new Vector3f(0, 0, 0));
+		}
 
-			RayTraceResult pos = ClientUtils.getBlockCoordsLookingAt(player);
+		@Override
+		public boolean shouldWidgetBeRendered(EntityPlayer player, Vector3f offset) {
+			if(getRenderType().equals(RenderType.WorldLocated)) {
+				//if (pos.equals(new Vector3f(0, 0, 0)))
+				//	return false;
+
+				offset.add(pos);
+				if(!utilsCommon.inRange(Minecraft.getMinecraft().player, new Vec3d(offset.x, offset.y, offset.z), viewDistance))
+					return false;
+			}
+
+			RayTraceResult pos = ClientSurface.getBlockCoordsLookingAt(player);
 			if(isLookingAtEnable && (pos == null || pos.getBlockPos().getX() != lookAt.x || pos.getBlockPos().getY() != lookAt.y || pos.getBlockPos().getZ() != lookAt.z) )
 				return false;		
 					
@@ -349,13 +324,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 
 		@Override
 		public boolean isWidgetOwner(String uuid){
-			if(getOwnerUUID() == null)
-				return true;
-
-			if(uuid.equals(getOwnerUUID().toString()))
-				return true;
-
-			return false;
+			return getOwnerUUID() == null || uuid.equals(getOwnerUUID().toString());
 		}
 
 		@Override

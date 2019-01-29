@@ -3,8 +3,8 @@ package ben_mkiv.rendertoolkit.common.widgets.core.modifiers;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetModifier;
 import ben_mkiv.rendertoolkit.common.widgets.core.Easing;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEasing;
-import org.lwjgl.opengl.GL11;
 import io.netty.buffer.ByteBuf;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 

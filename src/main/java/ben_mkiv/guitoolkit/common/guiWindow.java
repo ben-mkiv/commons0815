@@ -19,17 +19,20 @@ public class guiWindow extends GuiContainer {
     public boolean hasBackground = false;
 
     protected ArrayList<GuiTextField> textFields = new ArrayList<>();
-    static Box2D box = new Box2D();
+    static Box2D box;
+
+    static {
+        box = new Box2D();
+        box.setSize(2000, 2000);
+        box.WidgetModifierList.addColor(0, 0, 0, 0.5F);
+        box.WidgetModifierList.addColor(0.2F, 0.2F, 0.2F, 0.5F);
+    }
 
     protected Slot hoveredSlot = null;
     protected ItemStack hoveredJEI = null;
 
     public guiWindow(Container inventorySlotsIn) {
         super(inventorySlotsIn);
-
-        box.setSize(2000, 2000);
-        box.WidgetModifierList.addColor(0, 0, 0, 0.5F);
-        box.WidgetModifierList.addColor(0.2F, 0.2F, 0.2F, 0.5F);
     }
 
     public class screenLinkButton extends prettyButton {

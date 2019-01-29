@@ -69,29 +69,29 @@ public abstract class EntityWidget extends WidgetGLWorld implements IEntity {
             if(entity == null)
                 return;
 
-            int alphaColor = this.preRender(conditionStates, renderOffset);
+            preRender(conditionStates);
             applyModifiers(conditionStates);
 
             if(rendertype == RenderType.WorldLocated) {
-                GL11.glTranslatef(0.5F, 0.5F, 0.5F);
-                GL11.glRotated(180D, 0, 1D, 0D);
+                GlStateManager.translate(0.5F, 0.5F, 0.5F);
+                GlStateManager.rotate(180, 0, 1, 0);
                 if(faceWidgetToPlayer) {
-                    GL11.glRotated(player.rotationYaw, 0.0D, -1.0D, 0.0D);
-                    GL11.glRotated(180D, 0, 1D, 0D);
-                    GL11.glRotated(player.rotationPitch, 1.0D, 0.0D, 0.0D);
-                    GL11.glRotated(180D, 0, 1D, 0D);
+                    GlStateManager.rotate(player.rotationYaw, 0, -1, 0);
+                    GlStateManager.rotate(180, 0, 1, 0);
+                    GlStateManager.rotate(player.rotationPitch, 1, 0, 0);
+                    GlStateManager.rotate(180, 0, 1, 0);
                 }
-                GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
             }
             else {
-                this.applyAlignments();
-                GL11.glTranslatef(0F, 1F, 0F);
-                GL11.glRotated(180, 1, 0, 0);
+                applyAlignments();
+                GlStateManager.translate(0F, 1F, 0F);
+                GlStateManager.rotate(180, 1, 0, 0);
             }
 
-            renderEntity(((WidgetModifierRotate) WidgetModifierList.modifiers.get(0)).Y, renderOffset.x, renderOffset.y, renderOffset.z);
+            renderEntity(((WidgetModifierRotate) WidgetModifierList.modifiers.get(0)).Y, renderOffset);
 
-            this.postRender();
+            postRender();
         }
 
         private void applyAlignments(){
@@ -114,7 +114,7 @@ public abstract class EntityWidget extends WidgetGLWorld implements IEntity {
             }
         }
 
-        public void renderEntity(float rotation, double posX, double posY, double posZ) {
+        void renderEntity(float rotation, Vec3d location) {
             if(entity == null)
                 return;
 
@@ -123,7 +123,7 @@ public abstract class EntityWidget extends WidgetGLWorld implements IEntity {
             GlStateManager.enableColorMaterial();
             GlStateManager.pushMatrix();
 
-            GlStateManager.translate(posX, -posY, -50F);
+            GlStateManager.translate(location.x, -location.y, -50F);
             GlStateManager.scale(50, 50, 50);
 
             GlStateManager.rotate(135.0F, 0.0F, 1.0F, 0.0F);
@@ -148,5 +148,3 @@ public abstract class EntityWidget extends WidgetGLWorld implements IEntity {
     }
 
 }
-
-

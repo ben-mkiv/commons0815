@@ -1,6 +1,5 @@
 package ben_mkiv.rendertoolkit.common.widgets;
 
-//todo: convert to enum
 public class WidgetModifierConditionType {
 	public static final short
 			IS_WEATHER_RAIN = 1,

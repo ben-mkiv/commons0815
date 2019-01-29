@@ -47,6 +47,8 @@ public class renderToolkit
         Widget.register(OBJModel3D.class);
         Widget.register(EntityTracker3D.class);
         Widget.register(BoundingBox3D.class);
+        Widget.register(Fluid2D.class);
+        Widget.register(Entity2D.class);
 
         rTkNetwork.init();
 

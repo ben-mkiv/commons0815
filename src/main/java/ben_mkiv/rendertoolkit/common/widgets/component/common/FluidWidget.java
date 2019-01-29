@@ -21,7 +21,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
 
 /* thanks to mezz and JEI project for sharing source, which was reference for the getStillFluidSprite method ;) */
@@ -38,9 +37,8 @@ public abstract class FluidWidget extends WidgetGLWorld implements IFluid {
     public void writeData(ByteBuf buff) {
         super.writeData(buff);
 
-        if(fluidStack != null) {
+        if(fluidStack != null)
             ByteBufUtils.writeTag(buff, fluidStack.writeToNBT(new NBTTagCompound()));
-        }
         else
             ByteBufUtils.writeTag(buff, new NBTTagCompound());
     }
@@ -82,35 +80,28 @@ public abstract class FluidWidget extends WidgetGLWorld implements IFluid {
 
             TextureAtlasSprite fluidSprite = getStillFluidSprite(getFluid());
 
-            GL11.glPushMatrix();
-
-            int alphaColor = this.preRender(conditionStates, renderOffset);
+            int alphaColor = this.preRender(conditionStates);
             this.applyModifiers(conditionStates);
 
             if(rendertype == RenderType.WorldLocated) {
-                GL11.glTranslatef(0.5F, 0.5F, 0.5F);
-                GL11.glRotated(180D, 0, 1D, 0D);
+                GlStateManager.translate(0.5F, 0.5F, 0.5F);
+                GlStateManager.rotate(180, 0, 1, 0);
                 if(faceWidgetToPlayer) {
-                    GL11.glRotated(player.rotationYaw, 0.0D, -1.0D, 0.0D);
-                    GL11.glRotated(180D, 0, 1D, 0D);
-                    GL11.glRotated(player.rotationPitch, 1.0D, 0.0D, 0.0D);
-                    GL11.glRotated(180D, 0, 1D, 0D);
+                    GlStateManager.rotate(player.rotationYaw, 0, -1, 0);
+                    GlStateManager.rotate(180, 0, 1, 0);
+                    GlStateManager.rotate(player.rotationPitch, 1, 0, 0);
+                    GlStateManager.rotate(180, 0, 1, 0);
                 }
-                GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
             }
             else {
                 this.applyAlignments();
-                //GL11.glTranslatef(0F, 1F, 0F);
-                //GL11.glRotated(180, 1, 0, 0);
             }
-
 
             TextureManager tm = mc.getTextureManager();
 
             tm.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             tm.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-
-            //setGLColorFromInt(getFluid().getColor());
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -122,7 +113,6 @@ public abstract class FluidWidget extends WidgetGLWorld implements IFluid {
             tessellator.draw();
 
             this.postRender();
-            GL11.glPopMatrix();
         }
 
         private void setGLColorFromInt(int color) {
@@ -144,19 +134,19 @@ public abstract class FluidWidget extends WidgetGLWorld implements IFluid {
         private void applyAlignments(){
             switch(this.getHorizontalAlign()) {
                 case CENTER:
-                    GL11.glTranslatef(-0.5F, 0F, 0F);
+                    GlStateManager.translate(-0.5F, 0F, 0F);
                     break;
                 case RIGHT:
-                    GL11.glTranslatef(-1F, 0F, 0F);
+                    GlStateManager.translate(-1F, 0F, 0F);
                     break;
             }
 
             switch(this.getVerticalAlign()) {
                 case MIDDLE:
-                    GL11.glTranslatef(0F, -0.5F, 0F);
+                    GlStateManager.translate(0F, -0.5F, 0F);
                     break;
                 case BOTTOM:
-                    GL11.glTranslatef(0F, -1F, 0F);
+                    GlStateManager.translate(0F, -1F, 0F);
                     break;
             }
         }
@@ -164,5 +154,4 @@ public abstract class FluidWidget extends WidgetGLWorld implements IFluid {
     }
 
 }
-
 

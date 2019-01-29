@@ -3,14 +3,17 @@ package ben_mkiv.rendertoolkit.common.widgets.core.modifiers;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetModifier;
 import ben_mkiv.rendertoolkit.common.widgets.core.Easing;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEasing;
-import org.lwjgl.opengl.GL11;
 import io.netty.buffer.ByteBuf;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 
 public class WidgetModifierRotate extends WidgetModifier implements IEasing {
 	private float deg, x, y, z;
-	public float DEG, X, Y, Z;
+	private float DEG;
+	private float X;
+	public float Y;
+	private float Z;
 
 	private ArrayList<ArrayList> easingListX, easingListY, easingListZ, easingListDeg;
 

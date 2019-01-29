@@ -1,17 +1,15 @@
 package ben_mkiv.rendertoolkit.common.widgets;
 
+import ben_mkiv.commons0815.chickenbones.Matrix4;
 import ben_mkiv.commons0815.utils.utilsCommon;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEasing;
 import ben_mkiv.rendertoolkit.common.widgets.core.modifiers.*;
 import io.netty.buffer.ByteBuf;
-
-import java.util.ArrayList;
-
-import ben_mkiv.commons0815.chickenbones.Matrix4;
-
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.Vec3d;
 
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 
 public class WidgetModifiers {
 	public ArrayList<WidgetModifier> modifiers = new ArrayList<>();
@@ -42,32 +40,32 @@ public class WidgetModifiers {
 
 	public int addTranslate(float x, float y, float z){
 		this.modifiers.add(new WidgetModifierTranslate(x, y, z));
-		return this.modifiers.size()-1;
+		return this.modifiers.size();
 	}
 
 	public int addAutoTranslate(float x, float y){
 		this.modifiers.add(new WidgetModifierAutoTranslate(x, y));
-		return this.modifiers.size()-1;
+		return this.modifiers.size();
 	}
 		
 	public int addScale(float x, float y, float z){
 		this.modifiers.add(new WidgetModifierScale(x, y, z));
-		return this.modifiers.size()-1;
+		return this.modifiers.size();
 	}
 		
 	public int addRotate(float deg, float x, float y, float z){
 		this.modifiers.add(new WidgetModifierRotate(deg, x, y, z));
-		return this.modifiers.size()-1;
+		return this.modifiers.size();
 	}
 
 	public int addColor(float r, float g, float b, float alpha){
 		this.modifiers.add(new WidgetModifierColor(r, g, b, alpha));
-		return this.modifiers.size()-1;
+		return this.modifiers.size();
 	}
 	
 	public int addTexture(String texloc) {
 		this.modifiers.add(new WidgetModifierTexture(texloc));
-		return this.modifiers.size()-1;
+		return this.modifiers.size();
 	}
 
 	public void revoke(long conditionStates){
@@ -107,14 +105,14 @@ public class WidgetModifiers {
 	}
 
 	public float[] getCurrentColorFloat(long conditionStates, int index){
-		for(WidgetModifier modifier : modifiers){
-			if(modifier.getType() == WidgetModifier.WidgetModifierType.COLOR &&
-					modifier.shouldApplyModifier(conditionStates) == true){
+		for(int i=this.modifiers.size() - 1; i >= 0; i--){
+			if(this.modifiers.get(i).getType() == WidgetModifier.WidgetModifierType.COLOR &&
+				this.modifiers.get(i).shouldApplyModifier(conditionStates)){
 				if(index > 0){
 					index--;
 				}
 				else {
-					Object[] color = modifier.getValues();
+					Object[] color = this.modifiers.get(i).getValues();
 					return new float[]{ (float) color[0], (float) color[1], (float) color[2], (float) color[3] };
 				}
 			}
@@ -124,9 +122,9 @@ public class WidgetModifiers {
 
 	public float[] getCurrentScaleFloat(long conditionStates){
 		float scaleX = 1, scaleY = 1, scaleZ = 1;
-		for(WidgetModifier modifier : modifiers){
-			if(modifier.getType() == WidgetModifier.WidgetModifierType.SCALE && modifier.shouldApplyModifier(conditionStates)){
-				Object[] scale = modifier.getValues();
+		for(int i=0; i < this.modifiers.size(); i++){
+			if(this.modifiers.get(i).getType() == WidgetModifier.WidgetModifierType.SCALE && this.modifiers.get(i).shouldApplyModifier(conditionStates) == true){
+				Object[] scale = this.modifiers.get(i).getValues();
 				scaleX *= (float) scale[0];
 				scaleY *= (float) scale[1];
 				scaleZ *= (float) scale[2];
@@ -136,9 +134,9 @@ public class WidgetModifiers {
 	}
 
 	public void apply(long conditionStates){
-		lastConditionStates = conditionStates;
-		for(WidgetModifier modifier : modifiers)
-			modifier.apply(conditionStates);
+		this.lastConditionStates = conditionStates;
+		for(int i=0, count = this.modifiers.size(); i < count; i++) 
+			this.modifiers.get(i).apply(conditionStates);
 	}
 
 	public Vec3d getRenderPosition(long conditionStates, Vec3d offset, int w, int h, int d){
@@ -148,25 +146,29 @@ public class WidgetModifiers {
 		return new Vec3d(renderPosition.x + offset.x, renderPosition.y + offset.y, renderPosition.z + offset.z);
 	}
 
+	public Vec3d getRenderPosition(EntityPlayer player){
+		return new Vec3d(0, 0, 0);
+	}
+
 	public Vec3d generateGlMatrix(long conditionStates, float w, float h, float d){
 		Matrix4 m = new Matrix4();
 		Object[] b;
-		for(WidgetModifier modifier : modifiers)
-			if(modifier.shouldApplyModifier(conditionStates)) switch(modifier.getType()){
+		for(int i=0, count = this.modifiers.size(); i < count; i++)
+			if(this.modifiers.get(i).shouldApplyModifier(conditionStates)) switch(this.modifiers.get(i).getType()){
 				case AUTOTRANSLATE:
-					b = modifier.getValues();
+					b = this.modifiers.get(i).getValues();
 					m.translate(new Vector3f((float) b[0]*(w/100F), (float) b[1]*(h / 100F), d));
 					break;
 				case TRANSLATE:
-					b = modifier.getValues();
+					b = this.modifiers.get(i).getValues();
 					m.translate(new Vector3f((float) b[0], (float) b[1], (float) b[2]));
 					break;
 				case SCALE:
-					b = modifier.getValues();
+					b = this.modifiers.get(i).getValues();
 					m.scale(new Vector3f((float) b[0], (float) b[1], (float) b[2])); 
 					break;
 				case ROTATE:
-					b = modifier.getValues();
+					b = this.modifiers.get(i).getValues();
 					m.rotate((float) b[0], new Vector3f((float) b[1], (float) b[2], (float) b[3])); 					
 					break;
 		}

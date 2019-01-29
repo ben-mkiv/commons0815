@@ -2,13 +2,10 @@ package ben_mkiv.rendertoolkit.common.widgets.core.modifiers;
 
 import ben_mkiv.rendertoolkit.common.widgets.WidgetModifier;
 import io.netty.buffer.ByteBuf;
-
-import net.minecraft.util.ResourceLocation;
-
 import net.minecraft.client.Minecraft;
-
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 
@@ -36,7 +33,7 @@ public class WidgetModifierTexture extends WidgetModifier {
 		//GL11.glBindTexture(GL11.GL_TEXTURE_2D, mc.renderEngine.getTexture(imgFile));
 		
 		Minecraft mc = Minecraft.getMinecraft();
-		TextureAtlasSprite tex = Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry("minecraft:blocks/stone");		
+		TextureAtlasSprite tex = Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry("minecraft:blocks/stone");
 		//Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(tex.getIconName()));
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		//mc.getTextureManager().bindTexture(textureLocation);		

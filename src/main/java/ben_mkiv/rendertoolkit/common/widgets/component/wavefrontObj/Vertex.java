@@ -47,7 +47,7 @@ public class Vertex
     private double u = 0.0F;
     private double v = 0.0F;
 
-    //private Vertex initialState;
+    private Vertex initialState;
 
     public Vertex(double x, double y, double z, int rgba, int brightness, double u, double v, int normal, boolean isInitialState)
     {
@@ -64,8 +64,8 @@ public class Vertex
         this.normal = normal;
         this.baseName();
 
-        //if (!isInitialState)
-        //    initialState = new Vertex(x, y, z, rgba, brightness, u, v, normal, true);
+        if (!isInitialState)
+            initialState = new Vertex(x, y, z, rgba, brightness, u, v, normal, true);
     }
 
     public Vertex(double x, double y, double z)

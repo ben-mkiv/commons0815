@@ -1,23 +1,20 @@
 package ben_mkiv.rendertoolkit.common.widgets.component.common;
 
+import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetGLWorld;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.ICustomShape;
 import io.netty.buffer.ByteBuf;
-
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
 import org.lwjgl.opengl.GL11;
-
-import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 
 import java.util.ArrayList;
 
 public abstract class CustomShape extends WidgetGLWorld implements ICustomShape {
-    public static ArrayList<ArrayList> vectors;
+    public ArrayList<ArrayList> vectors;
     public boolean gl_strips;
     public boolean smooth_shading;
 
@@ -88,33 +85,31 @@ public abstract class CustomShape extends WidgetGLWorld implements ICustomShape 
     @SideOnly(Side.CLIENT)
     public class RenderableCustom extends RenderableGLWidget{
         @Override
-        public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
+        public void render(EntityPlayer player, Vec3d location, long conditionStates) {
             if(vectors.size() <3) return;
 
-            this.preRender(conditionStates, renderOffset);
+            this.preRender(conditionStates);
             this.applyModifiers(conditionStates);
             if(smooth_shading)
-                GL11.glShadeModel(GL11.GL_SMOOTH);
+                GlStateManager.shadeModel(GL11.GL_SMOOTH);
             else
-                GL11.glShadeModel(GL11.GL_FLAT);
-
+                GlStateManager.shadeModel(GL11.GL_FLAT);
 
             if(gl_strips) {
-                GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+                GlStateManager.glBegin(GL11.GL_TRIANGLE_STRIP);
                 for(int i=0; i < vectors.size(); i++)
-                    GL11.glVertex3f((float) vectors.get(i).get(0), (float) vectors.get(i).get(1), (float) vectors.get(i).get(2));
+                    GlStateManager.glVertex3f((float) vectors.get(i).get(0), (float) vectors.get(i).get(1), (float) vectors.get(i).get(2));
             }
             else{
                 GL11.glBegin(GL11.GL_TRIANGLES);
                 for(int i=3; i <= vectors.size(); i+=3) {
-                    GL11.glVertex3f((float) vectors.get(i-3).get(0), (float) vectors.get(i-3).get(1), (float) vectors.get(i-3).get(2));
-                    GL11.glVertex3f((float) vectors.get(i-2).get(0), (float) vectors.get(i-2).get(1), (float) vectors.get(i-2).get(2));
-                    GL11.glVertex3f((float) vectors.get(i-1).get(0), (float) vectors.get(i-1).get(1), (float) vectors.get(i-1).get(2));
+                    GlStateManager.glVertex3f((float) vectors.get(i-3).get(0), (float) vectors.get(i-3).get(1), (float) vectors.get(i-3).get(2));
+                    GlStateManager.glVertex3f((float) vectors.get(i-2).get(0), (float) vectors.get(i-2).get(1), (float) vectors.get(i-2).get(2));
+                    GlStateManager.glVertex3f((float) vectors.get(i-1).get(0), (float) vectors.get(i-1).get(1), (float) vectors.get(i-1).get(2));
                 }
             }
 
-            GL11.glEnd();
-
+            GlStateManager.glEnd();
 
             this.postRender();
         }

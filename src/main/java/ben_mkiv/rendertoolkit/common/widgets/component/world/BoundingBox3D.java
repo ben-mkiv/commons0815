@@ -74,7 +74,7 @@ public class BoundingBox3D extends Cube3D implements IBoundingBox {
         }
 
         public void renderCube(EntityPlayer player, Vec3d renderOffset, long conditionStates){
-            this.preRender(conditionStates, renderOffset);
+            this.preRender(conditionStates);
 
             this.applyModifiers(conditionStates);
 

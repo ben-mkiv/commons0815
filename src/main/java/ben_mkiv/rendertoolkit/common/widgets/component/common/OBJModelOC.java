@@ -1,23 +1,22 @@
 package ben_mkiv.rendertoolkit.common.widgets.component.common;
 
+import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.RenderType;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetGLWorld;
 import ben_mkiv.rendertoolkit.common.widgets.component.wavefrontObj.Face;
 import ben_mkiv.rendertoolkit.common.widgets.component.wavefrontObj.objParser;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IOBJModel;
-import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
-
-import net.minecraft.client.renderer.Tessellator;
+import com.google.common.base.Charsets;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.vertex.*;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import net.minecraft.entity.player.EntityPlayer;
-
-import com.google.common.base.Charsets;
-import io.netty.buffer.ByteBuf;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -31,7 +30,6 @@ public abstract class OBJModelOC extends WidgetGLWorld implements IOBJModel {
     public objParser objFile;
 
     public OBJModelOC() {
-        super();
         this.loadOBJ("none");
     }
 
@@ -78,21 +76,19 @@ public abstract class OBJModelOC extends WidgetGLWorld implements IOBJModel {
         };
 
         @Override
-        public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
+        public void render(EntityPlayer player, Vec3d location, long conditionStates) {
             if(objFile == null) return;
 
-            int color = this.preRender(conditionStates, renderOffset);
+            int color = this.preRender(conditionStates);
             this.applyModifiers(conditionStates);
 
             TESR = Tessellator.getInstance();
             buffer = TESR.getBuffer();
 
             if(rendertype == RenderType.WorldLocated) {
-                GL11.glTranslatef(0.5F, 0.5F, 0.5F);
-                GL11.glRotated(180.0D, 0.0D, 0.0D, 1.0D);
+                GlStateManager.rotate(180, 0, 0, 1);
                 this.addPlayerRotation(player);
-                GL11.glRotated(180.0D, 0.0D, 0.0D, 1.0D);
-                GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+                GlStateManager.rotate(180, 0, 0, 1);
             }
 
             if(objFile.facesTri.size() > 0) {

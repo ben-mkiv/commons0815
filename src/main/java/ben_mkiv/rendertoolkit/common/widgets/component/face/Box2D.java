@@ -1,27 +1,21 @@
 package ben_mkiv.rendertoolkit.common.widgets.component.face;
 
-import ben_mkiv.rendertoolkit.common.widgets.RenderType;
+import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
+import ben_mkiv.rendertoolkit.common.widgets.WidgetGLOverlay;
+import ben_mkiv.rendertoolkit.common.widgets.WidgetType;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IAutoTranslateable;
 import io.netty.buffer.ByteBuf;
-
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
-
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
 import org.lwjgl.opengl.GL11;
 
-import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
-import ben_mkiv.rendertoolkit.common.widgets.WidgetGLOverlay;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-
 public class Box2D extends WidgetGLOverlay implements IAutoTranslateable {
-	public Box2D() {
-		super();
-		this.rendertype = RenderType.GameOverlayLocated;
-	}
+	public Box2D() {}
 
 	@Override
 	public void writeData(ByteBuf buff) {
@@ -35,6 +29,11 @@ public class Box2D extends WidgetGLOverlay implements IAutoTranslateable {
 		readDataSIZE(buff);
 	}
 	
+	@Override
+	public WidgetType getType() {
+		return WidgetType.BOX2D;
+	}
+	
 	@SideOnly(Side.CLIENT)
 	@Override
 	public IRenderableWidget getRenderable() {
@@ -44,20 +43,18 @@ public class Box2D extends WidgetGLOverlay implements IAutoTranslateable {
 	@SideOnly(Side.CLIENT)
 	public class RenderableBox2DWidget extends RenderableGLWidget {
 		@Override
-		public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
-			this.preRender(conditionStates, renderOffset);
+		public void render(EntityPlayer player, Vec3d location, long conditionStates) {
+			this.preRender(conditionStates);
 			this.applyModifiers(conditionStates);
 			this.applyAlignments();
 
 			float[] col1 = this.getCurrentColorFloat(conditionStates, 1);
 			float[] col2 = this.getCurrentColorFloat(conditionStates, 0);
 
-			GL11.glPushMatrix();
 			Tessellator tessellator = Tessellator.getInstance();
 			createGradient(tessellator.getBuffer(), col1, col1, col2, col2);
 			//drawUVMappedRect(tessellator.getBuffer(), 0, width, 0, height);
 			tessellator.draw();
-			GL11.glPopMatrix();
 			this.postRender();
 		}
 
@@ -80,9 +77,9 @@ public class Box2D extends WidgetGLOverlay implements IAutoTranslateable {
 		public void applyAlignments() {
 			switch (this.getHorizontalAlign()) {
 				case CENTER:
-					GL11.glTranslatef((-width / 2F), 0F, 0F);
+					GL11.glTranslatef((width / 2F), 0F, 0F);
 					break;
-				case RIGHT:
+				case LEFT:
 					GL11.glTranslatef(-width, 0F, 0F);
 					break;
 			}
@@ -91,7 +88,7 @@ public class Box2D extends WidgetGLOverlay implements IAutoTranslateable {
 				case MIDDLE:
 					GL11.glTranslatef(0F, (-height / 2F), 0F);
 					break;
-				case BOTTOM:
+				case TOP:
 					GL11.glTranslatef(0F, -height, 0F);
 					break;
 			}
