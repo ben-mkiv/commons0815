@@ -229,6 +229,8 @@ public abstract class EntityWidget extends WidgetGLWorld implements IEntity {
             GlStateManager.disableRescaleNormal();
             GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
             GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+
+            Minecraft.getMinecraft().entityRenderer.disableLightmap();
         }
     }
 
