@@ -4,7 +4,7 @@ import ben_mkiv.rendertoolkit.common.widgets.WidgetModifier;
 import ben_mkiv.rendertoolkit.common.widgets.core.Easing;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEasing;
 import io.netty.buffer.ByteBuf;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.ArrayList;
 
@@ -20,15 +20,19 @@ public class WidgetModifierColor extends WidgetModifier implements IEasing {
 
 		switch(list.toLowerCase()) {
 			case "red":
+			case "r":
 				this.easingListRed = easing;
 				break;
 			case "green":
+			case "g":
 				this.easingListGreen = easing;
 				break;
 			case "blue":
+			case "b":
 				this.easingListBlue = easing;
 				break;
 			case "alpha":
+			case "a":
 				this.easingListAlpha = easing;
 				break;
 		}
@@ -83,9 +87,9 @@ public class WidgetModifierColor extends WidgetModifier implements IEasing {
 		this.applyEasings();
 
 		if(this.Alpha < 1)
-			GL11.glColor4f(this.red, this.green, this.blue, this.Alpha);
+			GlStateManager.color(this.red, this.green, this.blue, this.Alpha);
 		else
-			GL11.glColor3f(this.red, this.green, this.blue);
+			GlStateManager.color(this.red, this.green, this.blue);
 	}
 	
 	public void writeData(ByteBuf buff) {

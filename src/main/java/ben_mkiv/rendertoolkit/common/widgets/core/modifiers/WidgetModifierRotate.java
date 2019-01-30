@@ -4,7 +4,7 @@ import ben_mkiv.rendertoolkit.common.widgets.WidgetModifier;
 import ben_mkiv.rendertoolkit.common.widgets.core.Easing;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEasing;
 import io.netty.buffer.ByteBuf;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.ArrayList;
 
@@ -85,12 +85,12 @@ public class WidgetModifierRotate extends WidgetModifier implements IEasing {
 		this.applyEasings();
 
 
-		GL11.glRotatef(DEG, X, Y, Z);
+		GlStateManager.rotate(DEG, X, Y, Z);
 	}
 
 	public void revoke(long conditionStates){
 		if(!shouldApplyModifier(conditionStates)) return;
-		GL11.glRotatef(-DEG, X, Y, Z);
+		GlStateManager.rotate(-DEG, X, Y, Z);
 	}
 	
 	public void writeData(ByteBuf buff) {

@@ -26,6 +26,8 @@ public class ClientSurface {
 	public Map<Integer, IRenderableWidget> renderables = new ConcurrentHashMap<>();
 	public Map<Integer, IRenderableWidget> renderablesWorld = new ConcurrentHashMap<>();
 
+	public final static Vec3d vec3d000 = new Vec3d(0, 0, 0);
+
 	public int maxTrackingRange = 64;
 	public static int viewDistance = 64;
 	public boolean entityTrackerEnabled = true;
@@ -80,6 +82,11 @@ public class ClientSurface {
 		renderWidgets(renderables.values());
 		postRender(RenderType.GameOverlayLocated);
 	}
+
+	public static void renderSingleWidgetOverlay(IRenderableWidget widget, Long conditions){
+		renderSingleWidgetOverlay(widget, conditions, vec3d000);
+	}
+
 
 	public static void renderSingleWidgetOverlay(IRenderableWidget widget, Long conditions, Vec3d location){
 		preRender(RenderType.GameOverlayLocated, 0);
@@ -147,7 +154,7 @@ public class ClientSurface {
 	}
 
 	public static void renderWidget(IRenderableWidget widget, long conditionStates){
-		renderWidget(widget, conditionStates, new Vec3d(0, 0, 0));
+		renderWidget(widget, conditionStates, vec3d000);
 	}
 
 	public static void renderWidget(IRenderableWidget widget, long conditionStates, Vec3d location){

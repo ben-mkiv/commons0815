@@ -1,10 +1,13 @@
 package ben_mkiv.guitoolkit.common;
 
 import ben_mkiv.guitoolkit.client.widget.prettyButton;
+import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.component.face.Box2D;
+import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -20,6 +23,8 @@ public class guiWindow extends GuiContainer {
 
     protected ArrayList<GuiTextField> textFields = new ArrayList<>();
     static Box2D box;
+
+    static IRenderableWidget backgroundWidget;
 
     static {
         box = new Box2D();
@@ -48,26 +53,36 @@ public class guiWindow extends GuiContainer {
     public void initGui(){
         super.initGui();
         guiTop = 0;
+
+        backgroundWidget = box.getRenderable();
         //guiLeft = 0;
     }
 
+    public static void renderWidget(IRenderableWidget widget, Vec3d location){
+        ClientSurface.renderSingleWidgetOverlay(widget, Long.MAX_VALUE, location);
+
+        GlStateManager.enableTexture2D();
+        GlStateManager.bindTexture(0);
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.enableBlend();
+        GlStateManager.enableAlpha();
+    }
+
+    public static void renderWidget(IRenderableWidget widget){
+        renderWidget(widget, ClientSurface.vec3d000);
+    }
 
     @Override
     public void drawScreen(int mx, int my, float partialTicks) {
         this.updateScreen();
 
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        renderWidget(backgroundWidget);
 
-        box.getRenderable().render(mc.player, new Vec3d(0, 0, 0), Long.MAX_VALUE);
         super.drawScreen(mx, my, partialTicks);
         RenderHelper.disableStandardItemLighting();
 
         for (GuiTextField tF : textFields)
             tF.drawTextBox();
-
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_BLEND);
     }
 
     public String getName(){

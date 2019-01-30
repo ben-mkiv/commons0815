@@ -4,7 +4,7 @@ import ben_mkiv.rendertoolkit.common.widgets.WidgetModifier;
 import ben_mkiv.rendertoolkit.common.widgets.core.Easing;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEasing;
 import io.netty.buffer.ByteBuf;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.ArrayList;
 
@@ -71,7 +71,7 @@ public class WidgetModifierScale extends WidgetModifier implements IEasing {
 
 		this.applyEasings();
 
-		GL11.glScalef(X, Y, Z);
+		GlStateManager.scale(X, Y, Z);
 	}
 
 	private void applyEasings(){
@@ -83,9 +83,9 @@ public class WidgetModifierScale extends WidgetModifier implements IEasing {
 	public void revoke(long conditionStates) {
 		if (!shouldApplyModifier(conditionStates)) return;
 
-		if(X > 0) GL11.glScalef(1/X, 1, 1);
-		if(Y > 0) GL11.glScalef(1, 1/Y, 1);
-		if(Z > 0) GL11.glScalef(1, 1, 1/Z);
+		if(X > 0) GlStateManager.scale(1/X, 1, 1);
+		if(Y > 0) GlStateManager.scale(1, 1/Y, 1);
+		if(Z > 0) GlStateManager.scale(1, 1, 1/Z);
 	}
 	
 	public void writeData(ByteBuf buff) {
