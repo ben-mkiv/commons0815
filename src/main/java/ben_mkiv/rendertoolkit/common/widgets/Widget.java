@@ -22,11 +22,10 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 public abstract class Widget implements IAttribute{
 	boolean isVisible = true;
 	UUID widgetOwner = null;
-	static Map<Integer, Class<? extends Widget>> widgetTypes = new HashMap();
 
 	public static Widget create(int index){
 		try {
-			return widgetTypes.get(index).newInstance();
+			return WidgetType.values()[index].clazz.newInstance();
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
@@ -35,43 +34,7 @@ public abstract class Widget implements IAttribute{
 		return null;
 	}
 
-	public static Widget create(String name){
-		return Widget.create(getIndex(name));
-	}
-
-	public static int getIndex(String name){
-		for(Map.Entry<Integer, Class<? extends Widget>> e : widgetTypes.entrySet())
-			if(e.getValue().getSimpleName().equalsIgnoreCase(name))
-				return e.getKey();
-		return -1;
-	}
-
 	public abstract WidgetType getType();
-
-	public static Object[] getTypes(){
-		ArrayList<String> list = new ArrayList();
-		for(Class clazz : widgetTypes.values())
-			list.add(clazz.getSimpleName());
-
-		return list.toArray();
-	}
-
-	public String getTypeName(){
-		return getClass().getSimpleName();
-	}
-
-	public int getType(Class clazz){
-		for(Map.Entry<Integer, Class<? extends Widget>> e : widgetTypes.entrySet())
-			if(e.getValue().equals(clazz))
-				return e.getKey();
-		return -1;
-	}
-
-	public static int register(Class clazz){
-		widgetTypes.put(widgetTypes.size(), clazz);
-		return (widgetTypes.size()-1);
-	}
-
 
 
 	public WidgetModifiers WidgetModifierList = new WidgetModifiers();
@@ -115,8 +78,6 @@ public abstract class Widget implements IAttribute{
 		ByteBuf buff = Unpooled.copiedBuffer(b);
 		read(buff);
 	}
-
-
 
 	@SideOnly(Side.CLIENT)
 	public abstract IRenderableWidget getRenderable();

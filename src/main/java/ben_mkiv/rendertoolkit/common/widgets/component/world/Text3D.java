@@ -36,7 +36,7 @@ public class Text3D extends TextWidget {
 
 
 		@Override
-		public void render(EntityPlayer player, Vec3d location, long conditionStates) {
+		public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
 			if(getText().length() < 1) return;
 
 			updateStringDimensions();

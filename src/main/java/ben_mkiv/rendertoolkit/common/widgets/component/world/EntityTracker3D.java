@@ -26,23 +26,24 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class EntityTracker3D extends OBJModel3D implements ITracker {
     public enum EntityType{ NONE, ALL, ITEM, LIVING, PLAYER, HOSTILE, NEUTRAL, UNIQUE }
-    static ArrayList<WidgetModifier.WidgetModifierType> applyModifiersList;
+    private static ArrayList<WidgetModifier.WidgetModifierType> applyModifiersList;
 
-    public int maximumRange = 128;
-    public int trackingRange = 0;
-    public EntityType trackingType;
-    public String trackingEntityName = "";
-    public int trackingEntityMetaIndex = 0;
-    public UUID uniqueEntityID = null;
+    private int maximumRange = 128;
+    private int trackingRange = 0;
+    private EntityType trackingType;
+    private String trackingEntityName = "";
+    private int trackingEntityMetaIndex = 0;
+    private UUID uniqueEntityID = null;
 
     public EntityTracker3D(){
         super();
 
-        applyModifiersList = new ArrayList();
+        applyModifiersList = new ArrayList<>();
         applyModifiersList.add(WidgetModifier.WidgetModifierType.ROTATE);
         applyModifiersList.add(WidgetModifier.WidgetModifierType.TRANSLATE);
 
@@ -79,7 +80,7 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
             setupTrackingEntity(null);
     }
 
-    public void setupTracking(int tT, int range) {
+    private void setupTracking(int tT, int range) {
         setupTracking(EntityType.values()[tT], range);
     }
 
@@ -98,8 +99,8 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
     }
 
 
-    public ArrayList getAllEntities(Vec3d origin, int distance, World world, Class<? extends Entity> eClass, AxisAlignedBB bounds){
-        ArrayList entities = new ArrayList();
+    private HashSet<? extends Entity> getAllEntities(Vec3d origin, int distance, World world, Class<? extends Entity> eClass, AxisAlignedBB bounds){
+        HashSet<Entity> entities = new HashSet<>();
         for(Entity entity : world.getEntitiesWithinAABB(eClass, bounds)) {
             if(checkDistance(origin, new Vec3d(entity.posX, entity.posY, entity.posZ), distance))
                 entities.add(entity);
@@ -119,13 +120,11 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
     }
 
     @SideOnly(Side.CLIENT)
-    class RenderEntityTracker extends RenderableOBJModel{
+    public class RenderEntityTracker extends RenderableOBJModel{
         @Override
-        public void render(EntityPlayer player, Vec3d location, long conditionStates) {
+        public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
             if(objFile == null) return;
             if(!ClientSurface.instances.entityTrackerEnabled) return;    //require Geolyzer Update
-
-
 
             if(trackingType.equals(EntityType.NONE)) return;
 
@@ -139,10 +138,9 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                 focusedEntity = null;
 
             Vec3d playerPos = player.getPositionVector();
-            AxisAlignedBB bounds = new AxisAlignedBB(playerPos.x - trackingRange, playerPos.y - trackingRange, playerPos.z - trackingRange,
-                                                     playerPos.x + trackingRange, playerPos.y + trackingRange, playerPos.z + trackingRange);
+            AxisAlignedBB bounds = new AxisAlignedBB(playerPos, playerPos).grow(trackingRange);
 
-            GL11.glTranslated(-location.x, -location.y, -location.z);
+            GL11.glTranslated(renderOffset.x, renderOffset.y, renderOffset.z);
 
             this.preRender(conditionStates);
 
@@ -152,16 +150,17 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
             switch(trackingType) {
                 case ALL:
                 case ITEM:
-                    for (EntityItem e : (ArrayList<EntityItem>) getAllEntities(player.getPositionVector(), trackingRange, player.world, EntityItem.class, bounds)) {
+                    for (Entity e : getAllEntities(player.getPositionVector(), trackingRange, player.world, EntityItem.class, bounds)) {
                         if (!checkRender(e)) continue;
                         renderTarget(e.getPositionVector(), player, customRenderConditions(conditionStates, e, focusedEntity));
-            }   }
+                    }
+            }
 
             switch(trackingType) {
                 case ALL:
                 case PLAYER:
                 case LIVING:
-                    for (EntityPlayer e : (ArrayList<EntityPlayer>) getAllEntities(player.getPositionVector(), trackingRange, player.world, EntityPlayer.class, bounds)) {
+                    for (Entity e : getAllEntities(player.getPositionVector(), trackingRange, player.world, EntityPlayer.class, bounds)) {
                         if (!checkRender(e)) continue;
                         if (e == player) continue;
                         renderTarget(e.getPositionVector(), player, customRenderConditions(conditionStates, e, focusedEntity));
@@ -173,7 +172,7 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                 case LIVING:
                 case NEUTRAL:
                 case HOSTILE:
-                    for (EntityLiving e : (ArrayList<EntityLiving>) getAllEntities(player.getPositionVector(), trackingRange, player.world, EntityLiving.class, bounds)) {
+                    for (Entity e : getAllEntities(player.getPositionVector(), trackingRange, player.world, EntityLiving.class, bounds)) {
                         if(!checkRender(e)) continue;
                         renderTarget(e.getPositionVector(), player, customRenderConditions(conditionStates, e, focusedEntity));
             }   }
@@ -181,7 +180,7 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
             this.postRender();
         }
 
-        public long customRenderConditions(long customConditions, Entity e, Entity focusedEntity){
+        long customRenderConditions(long customConditions, Entity e, Entity focusedEntity){
             if(focusedEntity != null && focusedEntity.getPersistentID().equals(e.getPersistentID()))
                 customConditions |= ((long) 1 << WidgetModifierConditionType.IS_FOCUSED_ENTITY);
 
@@ -204,16 +203,13 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
         }
 
 
-        public boolean checkRender(Entity e){
+        boolean checkRender(Entity e){
             switch(trackingType) {
                 case ALL:
                     return true;
 
                 case UNIQUE:
-                    if(e.getUniqueID().equals(uniqueEntityID))
-                        return true;
-
-                    return false;
+                    return e.getUniqueID().equals(uniqueEntityID);
 
                 case HOSTILE:
                     if(!(e instanceof EntityMob))
@@ -256,22 +252,18 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                     if(trackingEntityMetaIndex != -1 && ((EntityItem) e).getItem().getMetadata() != trackingEntityMetaIndex)
                         return false;
 
-                    if(!((EntityItem) e).getItem().getItem().getRegistryName().toString().toLowerCase().equals(trackingEntityName))
-                        return false;
-
-                    return true;
+                    return trackingEntityName.equalsIgnoreCase(((EntityItem) e).getItem().getItem().getRegistryName().toString());
 
                 default:
                     return false;
             }
         }
 
-        public void renderTarget(Vec3d pos, EntityPlayer player, long conditionStates) {
+        void renderTarget(Vec3d pos, EntityPlayer player, long conditionStates) {
             GlStateManager.pushMatrix();
             GL11.glTranslated(pos.x, pos.y, pos.z);
 
             this.applyModifierList(conditionStates, applyModifiersList);
-            this.addPlayerRotation(player, pos);
 
             int color = WidgetModifierList.getCurrentColor(conditionStates, 0);
 
@@ -286,18 +278,13 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                 renderList(objFile.facesQuad, color);
                 TESR.draw();
             }
-            this.removePlayerRotation(player, pos);
+
             GlStateManager.popMatrix();
         }
     }
 
-    public static boolean checkDistance(Vec3d src, Vec3d target, int range){
-        double dx = target.x - src.x;
-        double dy = target.y - src.y;
-        double dz = target.z - src.z;
-        if(Math.sqrt(dx * dx + dy * dy + dz * dz) <= range) return true;
-
-        return false;
+    private static boolean checkDistance(Vec3d src, Vec3d target, int range){
+        return src.distanceTo(target) <= range;
     }
 
 }

@@ -43,7 +43,7 @@ public class Box2D extends WidgetGLOverlay implements IAutoTranslateable {
 	@SideOnly(Side.CLIENT)
 	public class RenderableBox2DWidget extends RenderableGLWidget {
 		@Override
-		public void render(EntityPlayer player, Vec3d location, long conditionStates) {
+		public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
 			this.preRender(conditionStates);
 			this.applyModifiers(conditionStates);
 			this.applyAlignments();

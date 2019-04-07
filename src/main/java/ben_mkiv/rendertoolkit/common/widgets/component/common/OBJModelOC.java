@@ -76,7 +76,7 @@ public abstract class OBJModelOC extends WidgetGLWorld implements IOBJModel {
         };
 
         @Override
-        public void render(EntityPlayer player, Vec3d location, long conditionStates) {
+        public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
             if(objFile == null) return;
 
             int color = this.preRender(conditionStates);

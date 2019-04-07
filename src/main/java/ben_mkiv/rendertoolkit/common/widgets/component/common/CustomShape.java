@@ -85,7 +85,7 @@ public abstract class CustomShape extends WidgetGLWorld implements ICustomShape 
     @SideOnly(Side.CLIENT)
     public class RenderableCustom extends RenderableGLWidget{
         @Override
-        public void render(EntityPlayer player, Vec3d location, long conditionStates) {
+        public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
             if(vectors.size() <3) return;
 
             this.preRender(conditionStates);

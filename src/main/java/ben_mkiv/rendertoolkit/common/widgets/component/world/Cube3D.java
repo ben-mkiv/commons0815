@@ -27,7 +27,7 @@ public class Cube3D extends WidgetGLWorld {
 	@SideOnly(Side.CLIENT)
 	class RenderCube3D extends RenderableGLWidget{
 		@Override
-		public void render(EntityPlayer player, Vec3d location, long conditionStates) {
+		public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
 			this.preRender(conditionStates);
 
 			this.applyModifiers(conditionStates);

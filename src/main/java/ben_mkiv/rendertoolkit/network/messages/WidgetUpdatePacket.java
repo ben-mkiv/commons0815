@@ -1,6 +1,7 @@
 package ben_mkiv.rendertoolkit.network.messages;
 
 import ben_mkiv.rendertoolkit.common.widgets.Widget;
+import ben_mkiv.rendertoolkit.common.widgets.WidgetType;
 import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

@@ -1,8 +1,5 @@
 package ben_mkiv.rendertoolkit;
 
-import ben_mkiv.rendertoolkit.common.widgets.Widget;
-import ben_mkiv.rendertoolkit.common.widgets.component.face.*;
-import ben_mkiv.rendertoolkit.common.widgets.component.world.*;
 import ben_mkiv.rendertoolkit.network.rTkNetwork;
 import ben_mkiv.rendertoolkit.proxy.CommonProxy;
 
@@ -35,21 +32,6 @@ public class renderToolkit
 
     @EventHandler
     public void init(FMLInitializationEvent event){
-        Widget.register(Cube3D.class);
-        Widget.register(Box2D.class);
-        Widget.register(Text2D.class);
-        Widget.register(Text3D.class);
-        Widget.register(Custom2D.class);
-        Widget.register(Custom3D.class);
-        Widget.register(Item2D.class);
-        Widget.register(Item3D.class);
-        Widget.register(OBJModel2D.class);
-        Widget.register(OBJModel3D.class);
-        Widget.register(EntityTracker3D.class);
-        Widget.register(BoundingBox3D.class);
-        Widget.register(Fluid2D.class);
-        Widget.register(Entity2D.class);
-
         rTkNetwork.init();
 
         proxy.init();

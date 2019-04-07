@@ -19,18 +19,9 @@ public enum WidgetType {
 	ENTITYTRACKER3D(EntityTracker3D.class);
 
 	Class<? extends Widget> clazz;
-	private WidgetType(Class<? extends Widget> cl) {
+
+	WidgetType(Class<? extends Widget> cl) {
 		clazz = cl;
 	}
-	
-	public Widget getNewInstance(){
-		try {
-			return this.clazz.newInstance();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+
 }

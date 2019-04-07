@@ -10,10 +10,17 @@ import java.util.UUID;
 
 @SideOnly(Side.CLIENT)
 public interface IRenderableWidget {
-	void render(EntityPlayer player, Vec3d location, long conditionStates);
+	void render(EntityPlayer player, Vec3d renderOffset, long conditionStates);
+
 	RenderType getRenderType();
+
 	boolean shouldWidgetBeRendered(EntityPlayer player);
+
 	boolean shouldWidgetBeRendered(EntityPlayer player, Vector3f offset);
+
 	UUID getWidgetOwner();
-	boolean isWidgetOwner(String uuid);
+
+	default boolean isWidgetOwner(String uuid){
+		return getWidgetOwner() == null || getWidgetOwner().toString().equals(uuid);
+	}
 }

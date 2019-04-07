@@ -150,16 +150,16 @@ public class ClientSurface {
 		GlStateManager.popMatrix();
 		GlStateManager.enableTexture2D();
 		GlStateManager.depthMask(true);
-		GlStateManager.enableDepth();
+		GlStateManager.disableDepth(); // this flag might depend on optifine
 	}
 
 	public static void renderWidget(IRenderableWidget widget, long conditionStates){
 		renderWidget(widget, conditionStates, vec3d000);
 	}
 
-	public static void renderWidget(IRenderableWidget widget, long conditionStates, Vec3d location){
+	public static void renderWidget(IRenderableWidget widget, long conditionStates, Vec3d renderOffset){
 		GlStateManager.pushMatrix();
-		widget.render(Minecraft.getMinecraft().player, location, conditionStates);
+		widget.render(Minecraft.getMinecraft().player, renderOffset, conditionStates);
 		GlStateManager.popMatrix();
 	}
 

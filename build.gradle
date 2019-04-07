@@ -20,7 +20,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 // java version
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
-def simpleVersion = "1.0.0"
+def simpleVersion = "1.0.1"
 
 def opencomputers_version = "MC1.12.2-1.7.2.67"
 
@@ -36,7 +36,7 @@ minecraft {
     replace "@VERSION@", simpleVersion
 
     runDir = "run"
-    version = "14.23.4.2718"
+    version = "1.12.2-14.23.4.2718"
     mappings = "snapshot_20180502"
 }
 

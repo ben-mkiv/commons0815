@@ -77,7 +77,7 @@ public abstract class ItemIcon extends WidgetGLWorld implements IItem {
 
     private class RenderableItemIcon extends RenderableGLWidget{
         @Override
-        public void render(EntityPlayer player, Vec3d location, long conditionStates) {
+        public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
             if(itmStack == null) return;
             if(ibakedmodel == null) ibakedmodel = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(itmStack);
 
@@ -86,8 +86,7 @@ public abstract class ItemIcon extends WidgetGLWorld implements IItem {
             tm.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             tm.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
 
-
-            GlStateManager.translate(location.x, location.y, location.z);
+            GlStateManager.translate(renderOffset.x, renderOffset.y, renderOffset.z);
 
             int alphaColor = this.preRender(conditionStates);
 

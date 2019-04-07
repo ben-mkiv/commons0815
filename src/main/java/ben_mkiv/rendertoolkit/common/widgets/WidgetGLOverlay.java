@@ -126,10 +126,8 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 	}
 
 	@SideOnly(Side.CLIENT)
-	public class RenderableGLWidget implements IRenderableWidget {		
+	public abstract class RenderableGLWidget implements IRenderableWidget {
 		boolean doBlending, doTexture, doSmoothShade, doAlpha;
-		@Override
-		public void render(EntityPlayer player, Vec3d location, long conditionStates) {}
 
 		public void setRenderFlags() {
 			doBlending = false;
@@ -320,11 +318,6 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 		@Override
 		public UUID getWidgetOwner() {
 			return getOwnerUUID();
-		}
-
-		@Override
-		public boolean isWidgetOwner(String uuid){
-			return getOwnerUUID() == null || uuid.equals(getOwnerUUID().toString());
 		}
 
 		@Override
