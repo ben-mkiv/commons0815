@@ -6,6 +6,7 @@ import ben_mkiv.rendertoolkit.common.widgets.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -132,7 +133,7 @@ public class ClientSurface {
 
 		switch (renderType){
 			case WorldLocated:
-				double[] playerLocation = getEntityPlayerLocation(Minecraft.getMinecraft().player, partialTicks);
+				double[] playerLocation = getEntityPlayerLocation(Minecraft.getMinecraft().getRenderViewEntity(), partialTicks);
 				GlStateManager.translate(-playerLocation[0], -playerLocation[1], -playerLocation[2]);
 				GlStateManager.depthMask(true);
 				break;
@@ -180,7 +181,7 @@ public class ClientSurface {
 		return true;
 	}
 
-	public static double[] getEntityPlayerLocation(EntityPlayer e, float partialTicks){
+	public static double[] getEntityPlayerLocation(Entity e, float partialTicks){
 		double x = e.prevPosX + (e.posX - e.prevPosX) * partialTicks;
 		double y = e.prevPosY + (e.posY - e.prevPosY) * partialTicks;
 		double z = e.prevPosZ + (e.posZ - e.prevPosZ) * partialTicks;
