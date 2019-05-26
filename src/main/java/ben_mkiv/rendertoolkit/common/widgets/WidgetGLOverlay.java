@@ -174,6 +174,8 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 
 				case FLUID2D:
 				case ENTITY2D:
+				case OCSCREEN2D:
+				case OCSCREEN3D:
 				case ITEM2D:
 					GlStateManager.enableDepth();
 					GlStateManager.depthMask(true);

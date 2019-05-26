@@ -4,6 +4,7 @@ import ben_mkiv.rendertoolkit.network.rTkNetwork;
 import ben_mkiv.rendertoolkit.proxy.CommonProxy;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -16,6 +17,9 @@ public class renderToolkit
 {
     public static final String MODID = "rendertoolkit";
     public static final String VERSION = "@VERSION@";
+
+    public static boolean Optifine = false;
+    public static boolean Albedo = false;
 
     @SidedProxy(clientSide = "ben_mkiv.rendertoolkit.proxy.ClientProxy", serverSide = "ben_mkiv.rendertoolkit.proxy.CommonProxy")
     public static CommonProxy proxy;
@@ -39,6 +43,8 @@ public class renderToolkit
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event){
+        Optifine = Loader.isModLoaded("optifine");
+        Albedo = Loader.isModLoaded("albedo");
         proxy.postInit();
     }
 }

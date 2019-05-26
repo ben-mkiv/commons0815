@@ -16,7 +16,9 @@ public enum WidgetType {
 	OBJMODEL3D(OBJModel3D.class),
 	ENTITY2D(Entity2D.class),
 	FLUID2D(Fluid2D.class),
-	ENTITYTRACKER3D(EntityTracker3D.class);
+	ENTITYTRACKER3D(EntityTracker3D.class),
+	OCSCREEN2D(ocScreen2D.class),
+	OCSCREEN3D(ocScreen3D.class);
 
 	Class<? extends Widget> clazz;
 
