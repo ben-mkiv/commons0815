@@ -26,7 +26,7 @@ public class ServerSurface {
     public static ServerEventHandler eventHandler;
     public static ServerSurface instances  = new ServerSurface();
 
-    public HashMap<EntityPlayer, Location> players = new HashMap<>();
+    public HashMap<EntityPlayer, UUID> players = new HashMap<>();
     public HashMap<UUID, PlayerStats> playerStats = new HashMap<>();
 
     public IMessage onClientEvent(ClientEventPacket message){
@@ -34,11 +34,10 @@ public class ServerSurface {
         return null;
     }
 
-
-    public String[] getActivePlayers(Location l){
+    public String[] getActivePlayers(UUID uuid){
         LinkedList<String> players = new LinkedList<String>();
-        for(Map.Entry<EntityPlayer, Location> p: this.players.entrySet()){
-            if(p.getValue().equals(l)){
+        for(Map.Entry<EntityPlayer, UUID> p: this.players.entrySet()){
+            if(p.getValue().equals(uuid)){
                 players.add(p.getKey().getGameProfile().getName());
             }
         }
@@ -49,9 +48,18 @@ public class ServerSurface {
         rTkNetwork.sendTo(new WidgetUpdatePacket(widgetList), player);
     }
 
+    @Deprecated
     public void sendToUUID(WidgetUpdatePacket packet, Location UUID){
-        for(Map.Entry<EntityPlayer, Location> e : players.entrySet()){
-            if(e.getValue().uniqueKey.equals(UUID.uniqueKey)){
+        for(Map.Entry<EntityPlayer, UUID> e : players.entrySet()){
+            if(e.getValue().equals(UUID.uniqueKey)){
+                rTkNetwork.channel.sendTo(packet, (EntityPlayerMP) e.getKey());
+            }
+        }
+    }
+
+    public void sendToUUID(WidgetUpdatePacket packet, UUID uuid){
+        for(Map.Entry<EntityPlayer, UUID> e : players.entrySet()){
+            if(e.getValue().equals(uuid)){
                 rTkNetwork.channel.sendTo(packet, (EntityPlayerMP) e.getKey());
             }
         }

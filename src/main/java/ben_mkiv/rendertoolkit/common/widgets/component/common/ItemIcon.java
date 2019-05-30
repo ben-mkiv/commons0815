@@ -121,7 +121,7 @@ public abstract class ItemIcon extends WidgetGLWorld implements IItem {
             tessellator.draw();
 
 
-            Minecraft.getMinecraft().fontRenderer.drawString("meow", 0, 0, 0xFFFFFF);
+            //Minecraft.getMinecraft().fontRenderer.drawString("meow", 0, 0, 0xFFFFFF);
             this.postRender();
         }
 
