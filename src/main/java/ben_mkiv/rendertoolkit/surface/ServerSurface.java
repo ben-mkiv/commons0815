@@ -58,8 +58,11 @@ public class ServerSurface {
     }
 
     public void sendToUUID(WidgetUpdatePacket packet, UUID uuid){
+        if(uuid == null)
+            return;
+
         for(Map.Entry<EntityPlayer, UUID> e : players.entrySet()){
-            if(e.getValue().equals(uuid)){
+            if(uuid.equals(e.getValue())){
                 rTkNetwork.channel.sendTo(packet, (EntityPlayerMP) e.getKey());
             }
         }
