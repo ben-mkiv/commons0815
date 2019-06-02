@@ -1,7 +1,6 @@
 package ben_mkiv.rendertoolkit.network.messages;
 
 import ben_mkiv.rendertoolkit.common.widgets.Widget;
-import ben_mkiv.rendertoolkit.common.widgets.WidgetType;
 import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -11,10 +10,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WidgetUpdatePacket  implements IMessage {
     public enum Action { AddWigets, RemoveWidgets, RemoveAllWidgets }
@@ -22,36 +18,47 @@ public class WidgetUpdatePacket  implements IMessage {
     public HashMap<Integer, Widget> widgetList;
     List<Integer> ids;
     Action type;
+    UUID uuid = null;
 
-    public WidgetUpdatePacket() {
+    public WidgetUpdatePacket() {}
+
+    public WidgetUpdatePacket(UUID uuid) {
         type = Action.RemoveAllWidgets;
+        this.uuid = uuid;
     }
 
-    public WidgetUpdatePacket(HashMap<Integer, Widget> widgetList) {
+    public WidgetUpdatePacket(UUID uuid, HashMap<Integer, Widget> widgetList) {
         this.widgetList = widgetList;
         type = Action.AddWigets;
+        this.uuid = uuid;
     }
 
-    public WidgetUpdatePacket(List<Integer> l){
+    public WidgetUpdatePacket(UUID uuid, List<Integer> l){
         ids = l;
         type = Action.RemoveWidgets;
+        this.uuid = uuid;
     }
 
-    public WidgetUpdatePacket(int id){
+    public WidgetUpdatePacket(UUID uuid, int id){
         ids = new ArrayList<Integer>();
         ids.add(id);
         type = Action.RemoveWidgets;
+        this.uuid = uuid;
     }
 
 
-    public WidgetUpdatePacket(int id, @Nonnull Widget widget) {
+    public WidgetUpdatePacket(UUID uuid, int id, @Nonnull Widget widget) {
         this.widgetList = new HashMap<>();
         widgetList.put(id, widget);
         this.type = Action.AddWigets;
+        this.uuid = uuid;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
+        if(buf.readBoolean())
+            uuid = new UUID(buf.readLong(), buf.readLong());
+
         type = Action.values()[buf.readInt()];
 
         switch (type) {
@@ -77,6 +84,12 @@ public class WidgetUpdatePacket  implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
+        buf.writeBoolean(uuid != null);
+        if(uuid != null) {
+            buf.writeLong(uuid.getMostSignificantBits());
+            buf.writeLong(uuid.getLeastSignificantBits());
+        }
+
         buf.writeInt(type.ordinal());
         switch (type) {
             case AddWigets:
@@ -105,9 +118,9 @@ public class WidgetUpdatePacket  implements IMessage {
         public IMessage onMessage(WidgetUpdatePacket message, MessageContext ctx) {
 
             switch (message.type) {
-                case AddWigets:         ClientSurface.instances.updateWidgets(message.widgetList.entrySet()); break;
-                case RemoveWidgets:     ClientSurface.instances.removeWidgets(message.ids); break;
-                case RemoveAllWidgets:  ClientSurface.instances.removeAllWidgets(); break;
+                case AddWigets:         ClientSurface.instances.updateWidgets(message.uuid, message.widgetList.entrySet()); break;
+                case RemoveWidgets:     ClientSurface.instances.removeWidgets(message.uuid, message.ids); break;
+                case RemoveAllWidgets:  ClientSurface.instances.removeAllWidgets(message.uuid); break;
             }
             return null;
         }

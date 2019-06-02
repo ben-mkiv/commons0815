@@ -24,8 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @SideOnly(Side.CLIENT)
 public class ClientSurface {
 	public static ClientSurface instances = new ClientSurface();
-	public Map<Integer, IRenderableWidget> renderables = new ConcurrentHashMap<>();
-	public Map<Integer, IRenderableWidget> renderablesWorld = new ConcurrentHashMap<>();
 
 	public final static Vec3d vec3d000 = new Vec3d(0, 0, 0);
 
@@ -36,41 +34,10 @@ public class ClientSurface {
 	public static ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
 	public static Vec3d renderResolution = null;
 
+	WidgetCollection widgets = new WidgetCollection();
+
 	public ClientSurface() {
 	}
-
-
-	//gets the current widgets and puts them to the correct hashmap
-	public void updateWidgets(Set<Entry<Integer, Widget>> widgets){
-		for(Entry<Integer, Widget> widget : widgets){
-			IRenderableWidget r = widget.getValue().getRenderable();
-			switch(r.getRenderType()){
-				case GameOverlayLocated:
-					renderables.put(widget.getKey(), r);
-					break;
-				case WorldLocated:
-					renderablesWorld.put(widget.getKey(), r);
-					break;
-			}
-		}
-	}
-
-	public int getWidgetCount(){
-		return (renderables.size() + renderablesWorld.size());
-	}
-
-	public void removeWidgets(List<Integer> ids){
-		for(Integer id : ids){
-			renderables.remove(id);
-			renderablesWorld.remove(id);
-		}
-	}
-	
-	public void removeAllWidgets(){
-		renderables.clear();
-		renderablesWorld.clear();
-	}
-
 
 	@SubscribeEvent
 	public void onRenderGameOverlay(RenderGameOverlayEvent evt) {
@@ -80,7 +47,7 @@ public class ClientSurface {
 		if(!shouldRenderStart(RenderType.GameOverlayLocated)) return;
 
 		preRender(RenderType.GameOverlayLocated, evt.getPartialTicks());
-		renderWidgets(renderables.values());
+		renderWidgets(widgets.getWidgetsOverlay().values());
 		postRender(RenderType.GameOverlayLocated);
 	}
 
@@ -106,7 +73,7 @@ public class ClientSurface {
 		if(!shouldRenderStart(RenderType.WorldLocated)) return;
 
 		preRender(RenderType.WorldLocated, event.getPartialTicks());
-		renderWidgets(renderablesWorld.values());
+		renderWidgets(widgets.getWidgetsWorld().values());
 		postRender(RenderType.WorldLocated);
 	}
 
@@ -164,23 +131,6 @@ public class ClientSurface {
 		GlStateManager.popMatrix();
 	}
 
-	public boolean shouldRenderStart(RenderType renderEvent){
-		switch(renderEvent){
-			case GameOverlayLocated:
-				if(renderables.size() < 1) return false;
-
-				break;
-
-			case WorldLocated:
-				if(renderablesWorld.size() < 1) return false;
-
-				break;
-
-		}
-
-		return true;
-	}
-
 	public static double[] getEntityPlayerLocation(Entity e, float partialTicks){
 		double x = e.prevPosX + (e.posX - e.prevPosX) * partialTicks;
 		double y = e.prevPosY + (e.posY - e.prevPosY) * partialTicks;
@@ -195,5 +145,26 @@ public class ClientSurface {
 		}
 		return null;
 	}
+
+	public boolean shouldRenderStart(RenderType renderEvent){
+		return getWidgetCount(null, renderEvent) > 0;
+	}
+
+	public void updateWidgets(UUID uuid, Set<Map.Entry<Integer, Widget>> widgets){
+		this.widgets.updateWidgets(widgets);
+	}
+
+	public void removeWidgets(UUID uuid, List<Integer> ids){
+		widgets.removeWidgets(ids);
+	}
+
+	public void removeAllWidgets(UUID uuid){
+		widgets.removeAllWidgets();
+	}
+
+	public int getWidgetCount(UUID uuid, RenderType renderEvent) {
+		return widgets.getWidgetCount(renderEvent);
+	}
+
 
 }

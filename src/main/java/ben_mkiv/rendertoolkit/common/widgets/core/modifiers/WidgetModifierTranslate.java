@@ -11,7 +11,6 @@ import java.util.ArrayList;
 public class WidgetModifierTranslate extends WidgetModifier implements IEasing {
 	public float x, y, z;
 	public float renderX, renderY, renderZ;
-
 	private ArrayList<ArrayList> easingListX, easingListY, easingListZ;
 
 	@Override
@@ -33,21 +32,21 @@ public class WidgetModifierTranslate extends WidgetModifier implements IEasing {
 	public void removeEasing(String list){
 		switch(list.toLowerCase()) {
 			case "x":
-				this.easingListX = new ArrayList<ArrayList>();
+				this.easingListX.clear();
 				break;
 			case "y":
-				this.easingListY = new ArrayList<ArrayList>();
+				this.easingListY.clear();
 				break;
 			case "z":
-				this.easingListZ = new ArrayList<ArrayList>();
+				this.easingListZ.clear();
 				break;
 		}
 	}
 
 	public WidgetModifierTranslate(float x, float y, float z){
-		this.easingListX = new ArrayList<ArrayList>();
-		this.easingListY = new ArrayList<ArrayList>();
-		this.easingListZ = new ArrayList<ArrayList>();
+		this.easingListX = new ArrayList<>();
+		this.easingListY = new ArrayList<>();
+		this.easingListZ = new ArrayList<>();
 
 		this.x = x;
 		this.y = y;
@@ -93,6 +92,7 @@ public class WidgetModifierTranslate extends WidgetModifier implements IEasing {
 		Easing.writeEasing(buff, this.easingListX);
 		Easing.writeEasing(buff, this.easingListY);
 		Easing.writeEasing(buff, this.easingListZ);
+
 	}
 	
 	public void readData(ByteBuf buff) {
@@ -103,6 +103,7 @@ public class WidgetModifierTranslate extends WidgetModifier implements IEasing {
 		this.easingListX = Easing.readEasing(buff);
 		this.easingListY = Easing.readEasing(buff);
 		this.easingListZ = Easing.readEasing(buff);
+
 	}	
 	
 	public WidgetModifierType getType(){

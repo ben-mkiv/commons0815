@@ -44,8 +44,8 @@ public class ServerSurface {
         return players.toArray(new String[]{});
     }
 
-    public void sendSync(EntityPlayer player, HashMap<Integer,Widget> widgetList){
-        rTkNetwork.sendTo(new WidgetUpdatePacket(widgetList), player);
+    public void sendSync(UUID uuid, EntityPlayer player, HashMap<Integer,Widget> widgetList){
+        rTkNetwork.sendTo(new WidgetUpdatePacket(uuid, widgetList), player);
     }
 
     @Deprecated

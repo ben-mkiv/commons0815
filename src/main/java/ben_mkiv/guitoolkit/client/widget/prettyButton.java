@@ -74,6 +74,16 @@ public class prettyButton extends GuiButton implements prettyElement {
     }
 
     @Override // Interface prettyElement
+    public void setRenderY(int pos) {
+        this.renderY = pos;
+    }
+
+    @Override // Interface prettyElement
+    public void setRenderX(int pos) {
+        this.renderX = pos;
+    }
+
+    @Override // Interface prettyElement
     public void setVisible(boolean isVisible) {
         visible = isVisible;
     }
@@ -84,7 +94,7 @@ public class prettyButton extends GuiButton implements prettyElement {
     }
 
     private boolean isPointInRegion(int x, int y) {
-        return !(x < this.x || x > this.x + this.width || y < this.y || y > this.y + this.height);
+        return !(x < this.x + this.renderX || x > this.x + this.width + this.renderX || y < this.y + this.renderY || y > this.y + this.height + this.renderY);
     }
 
     @Override
@@ -97,7 +107,7 @@ public class prettyButton extends GuiButton implements prettyElement {
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+        this.hovered = isPointInRegion(mouseX, mouseY);
 
         int i = this.getHoverState(this.hovered);
 
@@ -151,6 +161,11 @@ public class prettyButton extends GuiButton implements prettyElement {
 
         this.drawCenteredString(fontrenderer, this.displayString, posX, posY, textColor);
 
+    }
+
+    @Override
+    public boolean mousePressed(Minecraft mc, int mouseX, int mouseY){
+        return this.enabled && this.visible && isPointInRegion(mouseX, mouseY);
     }
 
 

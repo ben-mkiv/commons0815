@@ -38,11 +38,11 @@ public class prettyCheckbox extends prettyButton {
 
         mc.getTextureManager().bindTexture(texture);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        drawTexturedModalRect(x, y, textureX, textureY, dimension, dimension);
+        drawTexturedModalRect(x + renderX, y + renderY, textureX, textureY, dimension, dimension);
 
         if(displayString.length() > 0){
             FontRenderer fontrenderer = mc.fontRenderer;
-            fontrenderer.drawString(displayString, x + dimension + 2, y+ fontrenderer.FONT_HEIGHT/2 + 2, 0x0);
+            fontrenderer.drawString(displayString, x + renderX + dimension + 2, y + renderY + fontrenderer.FONT_HEIGHT/2 + 2, 0x0);
         }
     }
 

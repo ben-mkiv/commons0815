@@ -30,7 +30,7 @@ public class prettyList implements prettyElement {
             setY(Math.max(0, Math.min(getY(), element.getY())));
 
             if(!(element instanceof prettyList))
-                maxHeight = Math.max(maxHeight, element.getHeight());
+                maxHeight = Math.max(maxHeight, element.getY() + element.getHeight());
 
             /*
             if(element instanceof prettyButton) {
@@ -86,6 +86,11 @@ public class prettyList implements prettyElement {
                 entry.setY(entry.getY() + offset);
 
         this.y = pos; }
+
+    @Override
+    public void setRenderX(int pos){ x = pos; }
+
+    public void setRenderY(int pos){ y = pos; }
 
     @Override // Interface prettyElement
     public void setX(int pos){
@@ -152,7 +157,7 @@ public class prettyList implements prettyElement {
 
         for(int i=scrollValue, s=0; i < (elements.size()) && i < (scrollValue + displayElements); i++, s++){
             for(prettyElement element : elements.get(i)){
-                element.setY(getY() + (element.getHeight() * s));
+                element.setRenderY(elementHeight * s);
                 if(element instanceof prettyButton)
                     element.setVisible(true);
             }

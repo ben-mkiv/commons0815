@@ -8,6 +8,8 @@ public interface prettyElement {
 
     void setX(int pos);
     void setY(int pos);
+    void setRenderY(int pos);
+    void setRenderX(int pos);
 
     void setVisible(boolean state);
     boolean getVisible();
