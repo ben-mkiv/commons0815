@@ -14,10 +14,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static ben_mkiv.rendertoolkit.network.messages.ClientRequest.EventType.ASYNC_SCREEN_SIZES;
@@ -26,7 +23,7 @@ public class ServerSurface {
     public static ServerEventHandler eventHandler;
     public static ServerSurface instances  = new ServerSurface();
 
-    public HashMap<EntityPlayer, UUID> players = new HashMap<>();
+    public HashMap<EntityPlayer, HashSet<UUID>> players = new HashMap<>();
     public HashMap<UUID, PlayerStats> playerStats = new HashMap<>();
 
     public IMessage onClientEvent(ClientEventPacket message){
@@ -36,8 +33,8 @@ public class ServerSurface {
 
     public String[] getActivePlayers(UUID uuid){
         LinkedList<String> players = new LinkedList<String>();
-        for(Map.Entry<EntityPlayer, UUID> p: this.players.entrySet()){
-            if(p.getValue().equals(uuid)){
+        for(Map.Entry<EntityPlayer, HashSet<UUID>> p: this.players.entrySet()){
+            if(p.getValue().contains(uuid)){
                 players.add(p.getKey().getGameProfile().getName());
             }
         }
@@ -50,8 +47,8 @@ public class ServerSurface {
 
     @Deprecated
     public void sendToUUID(WidgetUpdatePacket packet, Location UUID){
-        for(Map.Entry<EntityPlayer, UUID> e : players.entrySet()){
-            if(e.getValue().equals(UUID.uniqueKey)){
+        for(Map.Entry<EntityPlayer, HashSet<UUID>> e : players.entrySet()){
+            if(e.getValue().contains(UUID.uniqueKey)){
                 rTkNetwork.channel.sendTo(packet, (EntityPlayerMP) e.getKey());
             }
         }
@@ -61,8 +58,8 @@ public class ServerSurface {
         if(uuid == null)
             return;
 
-        for(Map.Entry<EntityPlayer, UUID> e : players.entrySet()){
-            if(uuid.equals(e.getValue())){
+        for(Map.Entry<EntityPlayer, HashSet<UUID>> e : players.entrySet()){
+            if(e.getValue().contains(uuid)){
                 rTkNetwork.channel.sendTo(packet, (EntityPlayerMP) e.getKey());
             }
         }
