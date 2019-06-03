@@ -30,6 +30,8 @@ public class prettyCheckbox extends prettyButton {
         if (!this.visible)
             return;
 
+        this.hovered = isPointInRegion(mouseX, mouseY);
+
         int textureX = 32, textureY = 0;
         int dimension = 16;
 
@@ -42,7 +44,7 @@ public class prettyCheckbox extends prettyButton {
 
         if(displayString.length() > 0){
             FontRenderer fontrenderer = mc.fontRenderer;
-            fontrenderer.drawString(displayString, x + renderX + dimension + 2, y + renderY + fontrenderer.FONT_HEIGHT/2 + 2, 0x0);
+            fontrenderer.drawString(displayString, x + renderX + dimension + 2, y + renderY + fontrenderer.FONT_HEIGHT/2 + 2, packedFGColour);
         }
     }
 

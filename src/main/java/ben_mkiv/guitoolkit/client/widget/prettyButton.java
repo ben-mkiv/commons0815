@@ -93,7 +93,7 @@ public class prettyButton extends GuiButton implements prettyElement {
         return visible;
     }
 
-    private boolean isPointInRegion(int x, int y) {
+    protected boolean isPointInRegion(int x, int y) {
         return !(x < this.x + this.renderX || x > this.x + this.width + this.renderX || y < this.y + this.renderY || y > this.y + this.height + this.renderY);
     }
 
