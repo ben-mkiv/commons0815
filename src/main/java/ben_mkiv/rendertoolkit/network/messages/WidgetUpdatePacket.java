@@ -3,6 +3,7 @@ package ben_mkiv.rendertoolkit.network.messages;
 import ben_mkiv.rendertoolkit.common.widgets.Widget;
 import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -116,12 +117,22 @@ public class WidgetUpdatePacket  implements IMessage {
         @Override
         @SideOnly(Side.CLIENT)
         public IMessage onMessage(WidgetUpdatePacket message, MessageContext ctx) {
-
-            switch (message.type) {
-                case AddWigets:         ClientSurface.instances.updateWidgets(message.uuid, message.widgetList.entrySet()); break;
-                case RemoveWidgets:     ClientSurface.instances.removeWidgets(message.uuid, message.ids); break;
-                case RemoveAllWidgets:  ClientSurface.instances.removeAllWidgets(message.uuid); break;
-            }
+            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    switch (message.type) {
+                        case AddWigets:
+                            ClientSurface.instances.updateWidgets(message.uuid, message.widgetList.entrySet());
+                            return;
+                        case RemoveWidgets:
+                            ClientSurface.instances.removeWidgets(message.uuid, message.ids);
+                            return;
+                        case RemoveAllWidgets:
+                            ClientSurface.instances.removeAllWidgets(message.uuid);
+                            return;
+                    }
+                }
+            });
             return null;
         }
     }
