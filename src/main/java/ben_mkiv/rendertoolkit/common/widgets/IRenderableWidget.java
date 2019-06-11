@@ -20,6 +20,12 @@ public interface IRenderableWidget {
 
 	UUID getWidgetOwner();
 
+	boolean isVisible();
+
+	boolean isLookingAtEnabled();
+
+	Vec3d lookingAtVector();
+
 	default boolean isWidgetOwner(String uuid){
 		return getWidgetOwner() == null || getWidgetOwner().toString().equals(uuid);
 	}

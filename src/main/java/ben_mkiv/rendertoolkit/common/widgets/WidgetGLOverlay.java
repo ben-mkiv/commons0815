@@ -18,6 +18,8 @@ import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static ben_mkiv.rendertoolkit.surface.ClientSurface.vec3d000;
+
 
 public abstract class WidgetGLOverlay extends Widget implements IResizable, IPrivate {
 	public RenderType rendertype = RenderType.GameOverlayLocated;
@@ -82,7 +84,11 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 	public void setSize(double w, double h) {
 		this.width = (float) w;
 		this.height = (float) h;
-	}	
+	}
+
+	public Vector3f getPosition(){
+		return this.pos;
+	}
 	
 	public double getWidth() {
 		return this.width; }
@@ -302,8 +308,8 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 		@Override
 		public boolean shouldWidgetBeRendered(EntityPlayer player, Vector3f offset) {
 			if(getRenderType().equals(RenderType.WorldLocated)) {
-				//if (pos.equals(new Vector3f(0, 0, 0)))
-				//	return false;
+				if(offset.equals(vec3d000))
+					return true;
 
 				offset.add(pos);
 				if(!utilsCommon.inRange(Minecraft.getMinecraft().player, new Vec3d(offset.x, offset.y, offset.z), viewDistance))
@@ -333,6 +339,18 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 
 		public HAlignment getHorizontalAlign(){
 			return halign;
+		}
+
+		public boolean isVisible(){
+			return isVisible;
+		}
+
+		public boolean isLookingAtEnabled(){
+			return isLookingAtEnable;
+		}
+
+		public Vec3d lookingAtVector(){
+			return lookAt;
 		}
 	}
 }

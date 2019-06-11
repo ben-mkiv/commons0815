@@ -23,7 +23,8 @@ public class ServerSurface {
     public static ServerEventHandler eventHandler;
     public static ServerSurface instances  = new ServerSurface();
 
-    public HashMap<EntityPlayer, HashSet<UUID>> players = new HashMap<>();
+    //first UUID is the player UUID, hashset is a list of the connected hosts
+    public HashMap<UUID, HashSet<UUID>> players = new HashMap<>();
     public HashMap<UUID, PlayerStats> playerStats = new HashMap<>();
 
     public IMessage onClientEvent(ClientEventPacket message){
@@ -33,23 +34,26 @@ public class ServerSurface {
 
     public String[] getActivePlayers(UUID uuid){
         LinkedList<String> players = new LinkedList<String>();
-        for(Map.Entry<EntityPlayer, HashSet<UUID>> p: this.players.entrySet()){
+        for(Map.Entry<UUID, HashSet<UUID>> p: this.players.entrySet()){
             if(p.getValue().contains(uuid)){
-                players.add(p.getKey().getGameProfile().getName());
+                players.add(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(p.getKey()).getDisplayName().getUnformattedText());
             }
         }
         return players.toArray(new String[]{});
     }
 
     public void sendSync(UUID uuid, EntityPlayer player, HashMap<Integer,Widget> widgetList){
-        rTkNetwork.sendTo(new WidgetUpdatePacket(uuid, widgetList), player);
+        if(player != null)
+            rTkNetwork.sendTo(new WidgetUpdatePacket(uuid, widgetList), player);
     }
 
     @Deprecated
     public void sendToUUID(WidgetUpdatePacket packet, Location UUID){
-        for(Map.Entry<EntityPlayer, HashSet<UUID>> e : players.entrySet()){
+        for(Map.Entry<UUID, HashSet<UUID>> e : players.entrySet()){
             if(e.getValue().contains(UUID.uniqueKey)){
-                rTkNetwork.channel.sendTo(packet, (EntityPlayerMP) e.getKey());
+                EntityPlayerMP player = checkUUID(e.getKey());
+                if(player != null)
+                    rTkNetwork.channel.sendTo(packet, player);
             }
         }
     }
@@ -58,22 +62,34 @@ public class ServerSurface {
         if(uuid == null)
             return;
 
-        for(Map.Entry<EntityPlayer, HashSet<UUID>> e : players.entrySet()){
+        for(Map.Entry<UUID, HashSet<UUID>> e : players.entrySet()){
             if(e.getValue().contains(uuid)){
-                rTkNetwork.channel.sendTo(packet, (EntityPlayerMP) e.getKey());
+                EntityPlayerMP player = checkUUID(e.getKey());
+                if(player != null)
+                    rTkNetwork.channel.sendTo(packet, player);
             }
         }
     }
 
     public void requestResolutionEvent(EntityPlayerMP player){
-        rTkNetwork.channel.sendTo(new ClientRequest(ASYNC_SCREEN_SIZES), player);
+        if(player != null)
+            rTkNetwork.channel.sendTo(new ClientRequest(ASYNC_SCREEN_SIZES), player);
     }
 
-    public EntityPlayerMP checkUUID(String uuid){
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
-    }
+    HashMap<UUID, EntityPlayerMP> playerCache = new HashMap<>();
 
-    public EntityPlayerMP checkPlayerName(String name){
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(name);
+    public EntityPlayerMP checkUUID(UUID uuid){
+        if(!playerCache.containsKey(uuid) || playerCache.get(uuid) == null) {
+            EntityPlayerMP player = null;
+            for(EntityPlayerMP playerDB : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers())
+                if(uuid.equals(playerDB.getUniqueID())) {
+                    playerCache.put(uuid, player);
+                    return playerDB;
+                }
+
+            return player;
+        }
+
+        return playerCache.get(uuid);
     }
 }

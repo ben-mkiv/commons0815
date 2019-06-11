@@ -139,9 +139,9 @@ public class ClientSurface {
 	}
 
 	public static RayTraceResult getBlockCoordsLookingAt(EntityPlayer player){
-		RayTraceResult objectMouseOver = player.rayTrace(200, 1);
-		if(objectMouseOver != null && objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK){
-			return objectMouseOver;
+		//RayTraceResult objectMouseOver = player.rayTrace(200, 1);
+		if(Minecraft.getMinecraft().objectMouseOver != null && Minecraft.getMinecraft().objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK){
+			return Minecraft.getMinecraft().objectMouseOver;
 		}
 		return null;
 	}
