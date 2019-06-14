@@ -6,34 +6,12 @@ import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEasing;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.renderer.GlStateManager;
 
-import java.util.ArrayList;
-
 public class WidgetModifierRotate extends WidgetModifier implements IEasing {
 	private float deg, x, y, z;
 	private float DEG;
 	private float X;
 	public float Y;
 	private float Z;
-
-	private ArrayList<ArrayList> easingListX, easingListY, easingListZ, easingListDeg;
-
-	@Override
-	public void addEasing(String type, String typeIO, float duration, String list, float min, float max, String mode){
-		switch(list.toLowerCase()) {
-			case "x":
-				this.easingListX = Easing.setEasing(Easing.EasingType.valueOf(type.toUpperCase()), Easing.EasingTypeIO.valueOf(typeIO.toUpperCase()), duration, min, max, Easing.EasingTypeMode.valueOf(mode.toUpperCase()));
-				break;
-			case "y":
-				this.easingListY = Easing.setEasing(Easing.EasingType.valueOf(type.toUpperCase()), Easing.EasingTypeIO.valueOf(typeIO.toUpperCase()), duration, min, max, Easing.EasingTypeMode.valueOf(mode.toUpperCase()));
-				break;
-			case "z":
-				this.easingListZ = Easing.setEasing(Easing.EasingType.valueOf(type.toUpperCase()), Easing.EasingTypeIO.valueOf(typeIO.toUpperCase()), duration, min, max, Easing.EasingTypeMode.valueOf(mode.toUpperCase()));
-				break;
-			case "deg":
-				this.easingListDeg = Easing.setEasing(Easing.EasingType.valueOf(type.toUpperCase()), Easing.EasingTypeIO.valueOf(typeIO.toUpperCase()), duration, min, max, Easing.EasingTypeMode.valueOf(mode.toUpperCase()));
-				break;
-		}
-	}
 
 	@Override
 	public void update(float[] values){
@@ -48,31 +26,7 @@ public class WidgetModifierRotate extends WidgetModifier implements IEasing {
 		this.applyEasings();
 	}
 
-	@Override
-	public void removeEasing(String list){
-		switch(list.toLowerCase()) {
-			case "x":
-				this.easingListX = new ArrayList<ArrayList>();
-				break;
-			case "y":
-				this.easingListY = new ArrayList<ArrayList>();
-				break;
-			case "z":
-				this.easingListZ = new ArrayList<ArrayList>();
-				break;
-			case "deg":
-				this.easingListDeg = new ArrayList<ArrayList>();
-				break;
-		}
-	}
-
-
 	public WidgetModifierRotate(float deg, float x, float y, float z){
-		this.easingListX = new ArrayList<ArrayList>();
-		this.easingListY = new ArrayList<ArrayList>();
-		this.easingListZ = new ArrayList<ArrayList>();
-		this.easingListDeg = new ArrayList<ArrayList>();
-
 		this.deg = deg;
 		this.x = x;
 		this.y = y;
@@ -99,10 +53,6 @@ public class WidgetModifierRotate extends WidgetModifier implements IEasing {
 		buff.writeFloat(this.x);
 		buff.writeFloat(this.y);
 		buff.writeFloat(this.z);
-		Easing.writeEasing(buff, this.easingListX);
-		Easing.writeEasing(buff, this.easingListY);
-		Easing.writeEasing(buff, this.easingListZ);
-		Easing.writeEasing(buff, this.easingListDeg);
 	}
 	
 	public void readData(ByteBuf buff) {
@@ -111,10 +61,6 @@ public class WidgetModifierRotate extends WidgetModifier implements IEasing {
 		this.x = buff.readFloat();
 		this.y = buff.readFloat();
 		this.z = buff.readFloat();
-		this.easingListX = Easing.readEasing(buff);
-		this.easingListY = Easing.readEasing(buff);
-		this.easingListZ = Easing.readEasing(buff);
-		this.easingListDeg = Easing.readEasing(buff);
 	}
 	
 	public WidgetModifierType getType(){
@@ -122,10 +68,10 @@ public class WidgetModifierRotate extends WidgetModifier implements IEasing {
 	}	
 
 	private void applyEasings(){
-		this.X = Easing.applyEasing(this.easingListX, this.x);
-		this.Y = Easing.applyEasing(this.easingListY, this.y);
-		this.Z = Easing.applyEasing(this.easingListZ, this.z);
-		this.DEG = Easing.applyEasing(this.easingListDeg, this.deg);
+		this.X = Easing.applyEasing(easings.get("x"), this.x);
+		this.Y = Easing.applyEasing(easings.get("y"), this.y);
+		this.Z = Easing.applyEasing(easings.get("z"), this.z);
+		this.DEG = Easing.applyEasing(easings.get("deg"), this.deg);
 	}
 
 	public Object[] getValues(){

@@ -6,20 +6,20 @@ import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 
 public class Easing{
-    public static enum EasingType {
+    public enum EasingType {
         BACK, BOUNCE, CIRC, CUBIC, ELASTIC, EXPO, LINEAR, QUAD, QUART, QUINT, SINE
     };
 
-    public static enum EasingTypeIO {
+    public enum EasingTypeIO {
         IN, OUT, INOUT
     };
     
-    public static enum EasingTypeMode {
+    public enum EasingTypeMode {
         DEFAULT, LOOP, REPEAT  
     };
 
     public static float applyEasing(ArrayList easingList, float value){
-        if(easingList.size() == 0) return value;
+        if(easingList == null) return value;
 
         float timeNow = System.nanoTime() / 1000000F;
 
