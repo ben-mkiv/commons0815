@@ -22,9 +22,9 @@ public class interactGuiScreen extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        if(ClientSurface.renderResolution != null){
-            mouseX*=(ClientSurface.renderResolution.x / ClientSurface.resolution.getScaledWidth());
-            mouseY*=(ClientSurface.renderResolution.y / ClientSurface.resolution.getScaledHeight());
+        if(ClientSurface.resolution != null){
+            mouseX*=(ClientSurface.instances.getRenderResolution(null).x / ClientSurface.resolution.getScaledWidth());
+            mouseY*=(ClientSurface.instances.getRenderResolution(null).y / ClientSurface.resolution.getScaledHeight());
         }
         rTkNetwork.channel.sendToServer(new ClientEventPacket(EventType.INTERACT_OVERLAY, mc.player, new Vec3d(mouseX, mouseY, mouseButton)));
     }

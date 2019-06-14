@@ -18,8 +18,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 @SideOnly(Side.CLIENT)
 public class ClientSurface {
@@ -32,11 +30,19 @@ public class ClientSurface {
 	public boolean entityTrackerEnabled = true;
 
 	public static ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
-	public static Vec3d renderResolution = null;
+	private Vec3d renderResolution = null;
 
-	WidgetCollection widgets = new WidgetCollection();
+	private WidgetCollection widgets = new WidgetCollection();
 
 	public ClientSurface() {
+	}
+
+	public Vec3d getRenderResolution(UUID instanceUUID){
+		return renderResolution;
+	}
+
+	public void setRenderResolution(Vec3d resolution, UUID instanceUUID){
+		renderResolution = resolution;
 	}
 
 	@SubscribeEvent
@@ -106,8 +112,8 @@ public class ClientSurface {
 				break;
 
 			case GameOverlayLocated:
-				if(renderResolution != null)
-					GlStateManager.scale(ClientSurface.resolution.getScaledWidth() / renderResolution.x, ClientSurface.resolution.getScaledHeight() / renderResolution.y, 1);
+				if(instances.getRenderResolution(null) != null)
+					GlStateManager.scale(ClientSurface.resolution.getScaledWidth() / instances.getRenderResolution(null).x, ClientSurface.resolution.getScaledHeight() / instances.getRenderResolution(null).y, 1);
 
 				GlStateManager.depthMask(true);
 				break;

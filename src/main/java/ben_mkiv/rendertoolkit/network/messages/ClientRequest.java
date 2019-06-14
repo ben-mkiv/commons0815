@@ -9,6 +9,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.UUID;
+
 public class ClientRequest implements IMessage {
     public enum EventType{
         SYNC_SCREEN_SIZE,
@@ -19,24 +21,29 @@ public class ClientRequest implements IMessage {
     protected double width,height,scale;
 
     protected EventType type;
+    private UUID instanceUUID = null;
 
     public ClientRequest() {}
 
     //SET_RENDER_RESOLUTION
-    public ClientRequest(EventType type, double width, double height, double scale) {
-        this(type);
+    public ClientRequest(EventType type, UUID instanceUUID, double width, double height, double scale) {
+        this(type, instanceUUID);
         this.width = width;
         this.height = height;
         this.scale = scale;
     }
 
     //SYNC_SCREEN_SIZE, ASYNC_SCREEN_SIZES
-    public ClientRequest(EventType type) {
+    public ClientRequest(EventType type, UUID instanceUUID) {
         this.type = type;
+        this.instanceUUID = instanceUUID;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
+        if(buf.readBoolean())
+            instanceUUID = new UUID(buf.readLong(), buf.readLong());
+
         this.type = EventType.values()[buf.readInt()];
 
         if(this.type.equals(EventType.SET_RENDER_RESOLUTION)){
@@ -47,6 +54,12 @@ public class ClientRequest implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
+        buf.writeBoolean(instanceUUID != null);
+        if(instanceUUID != null){
+            buf.writeLong(instanceUUID.getMostSignificantBits());
+            buf.writeLong(instanceUUID.getLeastSignificantBits());
+        }
+
         buf.writeInt(this.type.ordinal());
 
         if(this.type.equals(EventType.SET_RENDER_RESOLUTION)){
@@ -60,10 +73,9 @@ public class ClientRequest implements IMessage {
         @Override
         public IMessage onMessage(ClientRequest message, MessageContext ctx) {
 
-
             switch(message.type){
                 case SET_RENDER_RESOLUTION:
-                    ClientSurface.renderResolution = new Vec3d(message.width, message.height, message.scale);
+                    ClientSurface.instances.setRenderResolution(new Vec3d(message.width, message.height, message.scale), message.instanceUUID);
                     break;
                 case ASYNC_SCREEN_SIZES:
                     //ClientSurface.instances.sendResolution();

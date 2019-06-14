@@ -71,9 +71,9 @@ public class ServerSurface {
         }
     }
 
-    public void requestResolutionEvent(EntityPlayerMP player){
+    public void requestResolutionEvent(EntityPlayerMP player, UUID instanceUUID){
         if(player != null)
-            rTkNetwork.channel.sendTo(new ClientRequest(ASYNC_SCREEN_SIZES), player);
+            rTkNetwork.channel.sendTo(new ClientRequest(ASYNC_SCREEN_SIZES, instanceUUID), player);
     }
 
     HashMap<UUID, EntityPlayerMP> playerCache = new HashMap<>();

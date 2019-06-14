@@ -1,8 +1,5 @@
 package ben_mkiv.rendertoolkit.common.widgets;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IAttribute;
 
@@ -21,14 +18,12 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public abstract class Widget implements IAttribute{
 	boolean isVisible = true;
-	UUID widgetOwner = null;
+	private UUID widgetOwner = null;
 
 	public static Widget create(int index){
 		try {
 			return WidgetType.values()[index].clazz.newInstance();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+		} catch (InstantiationException|IllegalAccessException e) {
 			e.printStackTrace();
 		}
 		return null;

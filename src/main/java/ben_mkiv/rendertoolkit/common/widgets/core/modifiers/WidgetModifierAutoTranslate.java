@@ -31,6 +31,7 @@ public class WidgetModifierAutoTranslate extends WidgetModifierTranslate {
         super.applyEasings();
 
         if(ClientSurface.instances != null){
+
             renderX*=((double) ClientSurface.resolution.getScaledWidth() / 100D);
             renderY*=((double) ClientSurface.resolution.getScaledHeight() / 100D);
         }
