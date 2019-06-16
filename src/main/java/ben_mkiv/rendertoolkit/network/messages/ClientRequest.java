@@ -78,10 +78,10 @@ public class ClientRequest implements IMessage {
                     ClientSurface.instances.setRenderResolution(new Vec3d(message.width, message.height, message.scale), message.instanceUUID);
                     break;
                 case ASYNC_SCREEN_SIZES:
-                    //ClientSurface.instances.sendResolution();
+                    ClientSurface.instances.sendResolution(message.instanceUUID);
                     break;
                 case SYNC_SCREEN_SIZE:
-                    //return new ClientEventPacket(ben_mkiv.rendertoolkit.network.EventType.GLASSES_SCREEN_SIZE, ClientSurface.instances.getRenderOffset());
+                    return new ClientEventPacket(ben_mkiv.rendertoolkit.network.EventType.GLASSES_SCREEN_SIZE, new Vec3d(ClientSurface.resolution.getScaledWidth(), ClientSurface.resolution.getScaledHeight(), ClientSurface.resolution.getScaleFactor()));
             }
 
             return null;

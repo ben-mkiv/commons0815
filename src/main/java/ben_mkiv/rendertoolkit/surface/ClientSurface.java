@@ -172,5 +172,5 @@ public class ClientSurface {
 		return widgets.getWidgetCount(renderEvent);
 	}
 
-
+	public void sendResolution(UUID instanceUUID){}
 }
