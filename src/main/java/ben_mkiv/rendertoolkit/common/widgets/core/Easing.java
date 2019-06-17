@@ -176,15 +176,22 @@ public class Easing{
     public static ArrayList readEasing(ByteBuf buff){
         ArrayList newList = new ArrayList();
 
-        if(buff.readInt() > 0)
-            newList = Easing.setEasing(Easing.EasingType.values()[buff.readInt()], Easing.EasingTypeIO.values()[buff.readInt()], buff.readFloat(), buff.readFloat(), buff.readFloat(), Easing.EasingTypeMode.values()[buff.readInt()]);
+        if(buff.readBoolean())
+            newList = Easing.setEasing(
+                    Easing.EasingType.values()[buff.readInt()],
+                    Easing.EasingTypeIO.values()[buff.readInt()],
+                    buff.readFloat(),
+                    buff.readFloat(),
+                    buff.readFloat(),
+                    Easing.EasingTypeMode.values()[buff.readInt()]);
 
         return newList;
     }
 
     public static void writeEasing(ByteBuf buff, ArrayList list){
-        buff.writeInt(list.size());
-        if(list.size() == 0) return;
+        buff.writeBoolean(list.size() == 7);
+
+        if(list.size() != 7) return;
 
         buff.writeInt(((Easing.EasingType) list.get(0)).ordinal());
         buff.writeInt(((Easing.EasingTypeIO) list.get(1)).ordinal());

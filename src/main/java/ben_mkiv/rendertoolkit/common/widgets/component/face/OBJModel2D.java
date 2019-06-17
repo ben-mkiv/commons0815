@@ -7,6 +7,7 @@ import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IAutoTranslateable;
 
 public class OBJModel2D extends OBJModelOC implements IAutoTranslateable {
     public OBJModel2D(){
+        super();
         this.rendertype = RenderType.GameOverlayLocated;
     }
 

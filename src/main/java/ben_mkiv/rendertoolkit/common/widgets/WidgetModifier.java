@@ -38,6 +38,7 @@ public abstract class WidgetModifier{
 	
 	public void writeData(ByteBuf buff){
 		buff.writeLong(this.conditions);
+
 		buff.writeInt(easings.size());
 		for(Map.Entry<String, ArrayList> entry : easings.entrySet()) {
 			ByteBufUtils.writeUTF8String(buff, entry.getKey());
@@ -47,8 +48,12 @@ public abstract class WidgetModifier{
 	
 	public void readData(ByteBuf buff){
 		this.conditions = buff.readLong();
-		for(int i=0; i < buff.readInt(); i++){
-			easings.replace(ByteBufUtils.readUTF8String(buff), Easing.readEasing(buff));
+
+		int easingCount = buff.readInt();
+		for(int i=0; i < easingCount; i++){
+			String listName = ByteBufUtils.readUTF8String(buff);
+			easings.remove(listName);
+			easings.put(listName, Easing.readEasing(buff));
 		}
 	}
 	

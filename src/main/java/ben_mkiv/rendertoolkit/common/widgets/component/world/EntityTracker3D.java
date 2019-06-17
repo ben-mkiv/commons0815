@@ -31,24 +31,19 @@ import java.util.UUID;
 
 public class EntityTracker3D extends OBJModel3D implements ITracker {
     public enum EntityType{ NONE, ALL, ITEM, LIVING, PLAYER, HOSTILE, NEUTRAL, UNIQUE }
-    private static ArrayList<WidgetModifier.WidgetModifierType> applyModifiersList;
+    private static ArrayList<WidgetModifier.WidgetModifierType> applyModifiersList = new ArrayList<>();
 
-    private int maximumRange = 128;
+    static {
+        applyModifiersList.add(WidgetModifier.WidgetModifierType.ROTATE);
+        applyModifiersList.add(WidgetModifier.WidgetModifierType.TRANSLATE);
+    }
+
+    private static int maximumRange = 128;
     private int trackingRange = 0;
-    private EntityType trackingType;
+    private EntityType trackingType = EntityType.ALL;
     private String trackingEntityName = "";
     private int trackingEntityMetaIndex = 0;
     private UUID uniqueEntityID = null;
-
-    public EntityTracker3D(){
-        super();
-
-        applyModifiersList = new ArrayList<>();
-        applyModifiersList.add(WidgetModifier.WidgetModifierType.ROTATE);
-        applyModifiersList.add(WidgetModifier.WidgetModifierType.TRANSLATE);
-
-        this.setupTracking(EntityType.ALL, 0);
-    }
 
     @Override
     public void writeData(ByteBuf buff) {
@@ -68,16 +63,18 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
     @Override
     public void readData(ByteBuf buff) {
         super.readData(buff);
-        trackingRange = Math.min(ClientSurface.instances.maxTrackingRange, buff.readInt());
-        setupTracking(buff.readInt(), trackingRange);
-        setupTrackingFilter(ByteBufUtils.readUTF8String(buff), buff.readInt());
+        trackingRange = Math.min(buff.readInt(), ClientSurface.instances.maxTrackingRange);
+        trackingType = EntityType.values()[buff.readInt()];
+        setupTracking(trackingType, trackingRange);
 
-        String uuid = ByteBufUtils.readUTF8String(buff);
+        trackingEntityName = ByteBufUtils.readUTF8String(buff);
+        trackingEntityMetaIndex = buff.readInt();
 
-        if(!uuid.equals("none"))
-            setupTrackingEntity(UUID.fromString(uuid));
-        else
-            setupTrackingEntity(null);
+        setupTrackingFilter(trackingEntityName, trackingEntityMetaIndex);
+
+        uniqueEntityID = string2UUID(ByteBufUtils.readUTF8String(buff));
+
+        setupTrackingEntity(uniqueEntityID);
     }
 
     private void setupTracking(int tT, int range) {
@@ -152,7 +149,7 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                 case ITEM:
                     for (Entity e : getAllEntities(player.getPositionVector(), trackingRange, player.world, EntityItem.class, bounds)) {
                         if (!checkRender(e)) continue;
-                        renderTarget(e.getPositionVector(), player, customRenderConditions(conditionStates, e, focusedEntity));
+                        renderTarget(e, player, customRenderConditions(conditionStates, e, focusedEntity));
                     }
             }
 
@@ -163,7 +160,7 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                     for (Entity e : getAllEntities(player.getPositionVector(), trackingRange, player.world, EntityPlayer.class, bounds)) {
                         if (!checkRender(e)) continue;
                         if (e == player) continue;
-                        renderTarget(e.getPositionVector(), player, customRenderConditions(conditionStates, e, focusedEntity));
+                        renderTarget(e, player, customRenderConditions(conditionStates, e, focusedEntity));
                     }
             }
 
@@ -174,7 +171,7 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
                 case HOSTILE:
                     for (Entity e : getAllEntities(player.getPositionVector(), trackingRange, player.world, EntityLiving.class, bounds)) {
                         if(!checkRender(e)) continue;
-                        renderTarget(e.getPositionVector(), player, customRenderConditions(conditionStates, e, focusedEntity));
+                        renderTarget(e, player, customRenderConditions(conditionStates, e, focusedEntity));
             }   }
 
             this.postRender();
@@ -259,13 +256,19 @@ public class EntityTracker3D extends OBJModel3D implements ITracker {
             }
         }
 
-        void renderTarget(Vec3d pos, EntityPlayer player, long conditionStates) {
+        void renderTarget(Entity entity, EntityPlayer player, long conditionStates) {
             GlStateManager.pushMatrix();
+            Vec3d pos = entity.getPositionVector();
             GL11.glTranslated(pos.x, pos.y, pos.z);
 
             this.applyModifierList(conditionStates, applyModifiersList);
 
             int color = WidgetModifierList.getCurrentColor(conditionStates, 0);
+
+            if(faceWidgetToPlayer){
+                GL11.glRotated( 180 - player.rotationYaw, 0.0D, 1.0D, 0.0D);
+                GL11.glRotated( -player.rotationPitch, 1.0D, 0.0D, 0.0D);
+            }
 
             if(objFile.facesTri.size() > 0) {
                 buffer.begin(GL11.GL_TRIANGLES, malisisVertexFormat);

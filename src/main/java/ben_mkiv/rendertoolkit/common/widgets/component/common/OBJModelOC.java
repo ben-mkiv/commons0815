@@ -25,35 +25,35 @@ public abstract class OBJModelOC extends WidgetGLWorld implements IOBJModel {
     public Tessellator TESR;
     public BufferBuilder buffer;
 
-    public String objData;
+    private String objData = "";
 
-    public objParser objFile;
-
-    public OBJModelOC() {
-        this.loadOBJ("none");
-    }
+    public objParser objFile = null;
 
     public void loadOBJ(String objData){
         this.objData = objData;
-        if(this.objData.equals("none")) return;
-
-        objFile = new objParser(this.objData);
+        this.objFile = objData.length() > 0 ? new objParser(objData) : null;
     }
 
     @Override
     public void writeData(ByteBuf buff) {
         super.writeData(buff);
 
-        byte[] utf8Bytes = this.objData.getBytes(Charsets.UTF_8);
-        buff.writeInt(utf8Bytes.length);
-        buff.writeBytes(utf8Bytes);
+        buff.writeBoolean(!objData.equals("none"));
+        if(!objData.equals("none")){
+            byte[] utf8Bytes = this.objData.getBytes(Charsets.UTF_8);
+            buff.writeInt(utf8Bytes.length);
+            buff.writeBytes(utf8Bytes);
+        }
     }
 
     @Override
     public void readData(ByteBuf buff) {
         super.readData(buff);
 
-        loadOBJ(buff.readBytes(buff.readInt()).toString(Charsets.UTF_8));
+        if(buff.readBoolean())
+            loadOBJ(buff.readBytes(buff.readInt()).toString(Charsets.UTF_8));
+        else
+            loadOBJ("");
     }
 
     @SideOnly(Side.CLIENT)
