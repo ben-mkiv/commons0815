@@ -43,6 +43,11 @@ public class prettyButton extends GuiButton implements prettyElement {
         return true;
     }
 
+    @Override
+    public boolean isMouseOver(){
+        return this.hovered;
+    }
+
     @Override // Interface prettyElement
     public int getY() {
         return this.y;

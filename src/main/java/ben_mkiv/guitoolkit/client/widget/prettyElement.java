@@ -15,5 +15,5 @@ public interface prettyElement {
     boolean getVisible();
 
     default void clicked(){}
-    default boolean isMouseOver(){ return false; }
+    boolean isMouseOver();
 }
