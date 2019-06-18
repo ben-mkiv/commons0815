@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.vecmath.Vector3f;
 import java.util.*;
 
 @SideOnly(Side.CLIENT)
@@ -24,6 +25,7 @@ public class ClientSurface {
 	public static ClientSurface instances = new ClientSurface();
 
 	public final static Vec3d vec3d000 = new Vec3d(0, 0, 0);
+	public final static Vector3f vec3f000 = new Vector3f(0, 0, 0);
 
 	public int maxTrackingRange = 64;
 	public static int viewDistance = 64;

@@ -38,6 +38,7 @@ public class Text2D extends TextWidget implements IAutoTranslateable {
 			updateAlignments();
 
 			int currentColor = this.preRender(conditionStates);
+
 			this.applyModifiers(conditionStates);
 
 			GlStateManager.translate(offsetX, offsetY, 0F);

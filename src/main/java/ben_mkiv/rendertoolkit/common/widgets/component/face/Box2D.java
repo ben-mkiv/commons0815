@@ -3,6 +3,7 @@ package ben_mkiv.rendertoolkit.common.widgets.component.face;
 import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetGLOverlay;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetType;
+import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IAlignable;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IAutoTranslateable;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -14,7 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
-public class Box2D extends WidgetGLOverlay implements IAutoTranslateable {
+public class Box2D extends WidgetGLOverlay implements IAutoTranslateable, IAlignable {
 	public Box2D() {}
 
 	@Override

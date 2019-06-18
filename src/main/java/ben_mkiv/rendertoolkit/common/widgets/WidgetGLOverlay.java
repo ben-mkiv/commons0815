@@ -18,8 +18,7 @@ import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import static ben_mkiv.rendertoolkit.surface.ClientSurface.vec3d000;
-
+import static ben_mkiv.rendertoolkit.surface.ClientSurface.vec3f000;
 
 public abstract class WidgetGLOverlay extends Widget implements IResizable, IPrivate {
 	public RenderType rendertype = RenderType.GameOverlayLocated;
@@ -32,20 +31,21 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 	public enum VAlignment{	TOP, MIDDLE, BOTTOM }
 	public enum HAlignment{	LEFT, CENTER, RIGHT }
 
-	public VAlignment valign = VAlignment.BOTTOM;
-	public HAlignment halign = HAlignment.RIGHT;
+	protected VAlignment valign = VAlignment.BOTTOM;
+	protected HAlignment halign = HAlignment.RIGHT;
 
-	public boolean isThroughVisibility = false;
-	public boolean isLookingAtEnable = false;
+	boolean isThroughVisibility = false;
+	private boolean isLookingAtEnable = false;
+
 	public boolean faceWidgetToPlayer = false;
 
-	public Vec3d lookAt = new Vec3d(0, 0, 0);
+	private Vec3d lookAt = new Vec3d(0, 0, 0);
 
-	public int viewDistance = 64;
+	private int viewDistance = 64;
 
-	public long age = 0;
+	private long age = 0;
 
-	public WidgetGLOverlay(){}
+	protected WidgetGLOverlay(){}
 	
 	public void writeData(ByteBuf buff) {
 		WidgetModifierList.writeData(buff);
@@ -71,12 +71,12 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 		isLookingAtEnable = buff.readBoolean();
 	}
 
-	public void writeDataSIZE(ByteBuf buff) {
+	protected void writeDataSIZE(ByteBuf buff) {
 		buff.writeFloat(this.width);
 		buff.writeFloat(this.height);
 	}
-	
-	public void readDataSIZE(ByteBuf buff) {
+
+	protected void readDataSIZE(ByteBuf buff) {
 		this.width = buff.readFloat();
 		this.height = buff.readFloat();
 	}
@@ -135,7 +135,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 	public abstract class RenderableGLWidget implements IRenderableWidget {
 		boolean doBlending, doTexture, doSmoothShade, doAlpha;
 
-		public void setRenderFlags() {
+		void setRenderFlags() {
 			doBlending = false;
 			doTexture = false;
 			doSmoothShade = false;
@@ -204,10 +204,8 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 			else {
 				GlStateManager.disableBlend();
 			}
-			if(doSmoothShade)
-				GlStateManager.shadeModel(GL11.GL_SMOOTH);
-			else
-				GlStateManager.shadeModel(GL11.GL_FLAT);
+
+			GlStateManager.shadeModel(doSmoothShade ? GL11.GL_SMOOTH : GL11.GL_FLAT);
 
 			if(doAlpha)
 				GlStateManager.enableAlpha();
@@ -223,11 +221,11 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 			return WidgetModifierList.getCurrentColor(conditionStates, 0);
 		}
 
-		public void updateRenderPosition(long conditionStates){
+		void updateRenderPosition(long conditionStates){
 			updateRenderPosition(conditionStates, new Vec3d(0, 0, 0));
 		}
 
-		public void updateRenderPosition(long conditionStates, Vec3d renderOrigin){
+		void updateRenderPosition(long conditionStates, Vec3d renderOrigin){
 			Vec3d renderPosition = WidgetModifierList.getRenderPosition(conditionStates, renderOrigin, ClientSurface.resolution.getScaledWidth(), ClientSurface.resolution.getScaledHeight(), 1);
 			pos = new Vector3f((float) renderPosition.x, (float) renderPosition.y, (float) renderPosition.z);
 			pos.add(margin);
@@ -239,7 +237,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 			return WidgetModifierList.getCurrentColor(WidgetModifierList.lastConditionStates, 0);
 		}
 
-		public void addPlayerRotation(EntityPlayer player){
+		protected void addPlayerRotation(EntityPlayer player){
 			if(!faceWidgetToPlayer) return;
 
 			GL11.glRotated(player.rotationYaw,0.0D,1.0D,0.0D);
@@ -275,7 +273,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 			GL11.glRotated(-player.rotationYaw,0.0D,1.0D,0.0D);
 		}
 
-		public void applyModifierList(long conditionStates, ArrayList<WidgetModifier.WidgetModifierType> modifierTypes){
+		protected void applyModifierList(long conditionStates, ArrayList<WidgetModifier.WidgetModifierType> modifierTypes){
 			for(WidgetModifier m : WidgetModifierList.modifiers){
 				for(WidgetModifier.WidgetModifierType t : modifierTypes){
 					if(t.equals(m.getType())){
@@ -293,7 +291,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 			WidgetModifierList.revoke(WidgetModifierList.lastConditionStates);
 		}
 
-		public float[] getCurrentColorFloat(long conditionStates, int index){
+		protected float[] getCurrentColorFloat(long conditionStates, int index){
 			return WidgetModifierList.getCurrentColorFloat(conditionStates, index);
 		}
 
@@ -308,7 +306,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 		@Override
 		public boolean shouldWidgetBeRendered(EntityPlayer player, Vector3f offset) {
 			if(getRenderType().equals(RenderType.WorldLocated)) {
-				if(offset.equals(vec3d000))
+				if(offset.equals(vec3f000))
 					return true;
 
 				offset.add(pos);
@@ -333,11 +331,11 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 			return rendertype;
 		}
 
-		public VAlignment getVerticalAlign(){
+		protected VAlignment getVerticalAlign(){
 			return valign;
 		}
 
-		public HAlignment getHorizontalAlign(){
+		protected HAlignment getHorizontalAlign(){
 			return halign;
 		}
 
