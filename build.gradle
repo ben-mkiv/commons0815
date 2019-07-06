@@ -92,7 +92,8 @@ jar {
     manifest {
         attributes([
                 "Maven-Artifact":"${project.group}:${project.archivesBaseName}:${project.version}",
-                'Timestamp': System.currentTimeMillis()
+                'Timestamp': System.currentTimeMillis(),
+                'FMLAT': 'rendertoolkit_at.cfg'
         ])
     }
 }
