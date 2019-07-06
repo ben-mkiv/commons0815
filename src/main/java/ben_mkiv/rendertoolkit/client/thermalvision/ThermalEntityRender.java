@@ -65,7 +65,6 @@ public class ThermalEntityRender {
             }
         }
 
-
         // get distance to player
         currentDistance = event.getEntity().getPositionVector().distanceTo(Minecraft.getMinecraft().player.getPositionVector());
 
@@ -88,15 +87,15 @@ public class ThermalEntityRender {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void renderFogEvent(EntityViewRenderEvent.FogDensity event) {
-        event.setDensity(0.1f);
+        event.setDensity(0.05f);
         GlStateManager.setFog(GlStateManager.FogMode.EXP2);
         event.setCanceled(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void renderFogEvent(EntityViewRenderEvent.FogColors event) {
-        event.setBlue(0);
-        event.setGreen(1);
-        event.setRed(0);
+        event.setRed(0.2f);
+        event.setGreen(0.4f);
+        event.setBlue(0.85f);
     }
 }

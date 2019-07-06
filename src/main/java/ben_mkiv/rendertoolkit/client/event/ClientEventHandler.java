@@ -7,6 +7,7 @@ import ben_mkiv.rendertoolkit.renderToolkit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -44,7 +45,5 @@ public class ClientEventHandler {
         if(event.getSide().isServer()) return;
         Logger.getLogger(renderToolkit.MODID).warning("client side onInteractEvent");
     }
-
-
 
 }

@@ -16,8 +16,6 @@ void main() {
     float totalAlpha = 0.0;
     float totalSamples = 0.0;
 
-    vec4 sampleRef = texture2D(DiffuseSampler, texCoord);
-
     for(float r = -Radius; r <= Radius; r += 1.0) {
            vec4 sample = texture2D(DiffuseSampler, texCoord + oneTexel * r * BlurDir);
 

@@ -42,6 +42,7 @@ public class ThermalFramebuffer extends Framebuffer {
         float f1 = (float)height;
         float f2 = (float)this.framebufferWidth / (float)this.framebufferTextureWidth;
         float f3 = (float)this.framebufferHeight / (float)this.framebufferTextureHeight;
+
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
@@ -50,8 +51,8 @@ public class ThermalFramebuffer extends Framebuffer {
         bufferbuilder.pos((double)f, 0.0D, 0.0D).tex((double)f2, (double)f3).color(255, 255, 255, 255).endVertex();
         bufferbuilder.pos(0.0D, 0.0D, 0.0D).tex(0.0D, (double)f3).color(255, 255, 255, 255).endVertex();
         tessellator.draw();
+
         unbindFramebufferTexture();
         GlStateManager.depthMask(true);
-        //GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 }
