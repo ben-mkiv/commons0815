@@ -34,7 +34,7 @@ minecraft {
 
     runDir = "run"
     version = "${minecraftVersion}-${forge_version}"
-    mappings = "${mcp_version}"
+    mappings = mcp_version
 }
 
 runClient {

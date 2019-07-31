@@ -12,6 +12,9 @@ public class WidgetModifierColor extends WidgetModifier implements IEasing {
 
 	@Override
 	public void addEasing(String type, String typeIO, float duration, String list, float min, float max, String mode){
+		min = Math.max(0, Math.min(min, 1));
+		max = Math.max(0, Math.min(max, 1));
+
 		switch (list.toLowerCase()){
 			case "red":
 			case "r":
@@ -59,12 +62,12 @@ public class WidgetModifierColor extends WidgetModifier implements IEasing {
 		if(values.length < 3)
 			return;
 
-		this.r = values[0];
-		this.g = values[1];
-		this.b = values[2];
+		this.r = Math.max(0, Math.min(values[0], 1));
+		this.g = Math.max(0, Math.min(values[1], 1));
+		this.b = Math.max(0, Math.min(values[2], 1));
 
 		if(values.length >= 4)
-			this.alpha = values[3];
+			this.alpha = Math.max(0, Math.min(values[3], 1));
 		else
 			this.alpha = 1;
 
@@ -100,10 +103,10 @@ public class WidgetModifierColor extends WidgetModifier implements IEasing {
 	}
 
 	private void setColor(float r, float g, float b, float alpha){
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.alpha = alpha;
+		this.r = Math.max(0, Math.min(r, 1));
+		this.g = Math.max(0, Math.min(g, 1));
+		this.b = Math.max(0, Math.min(b, 1));
+		this.alpha = Math.max(0, Math.min(alpha, 1));
 	}
 	
 	public WidgetModifierType getType(){
