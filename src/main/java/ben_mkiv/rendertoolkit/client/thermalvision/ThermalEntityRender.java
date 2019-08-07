@@ -46,8 +46,15 @@ public class ThermalEntityRender {
 
     @SubscribeEvent
     public void preRender(RenderLivingEvent.Pre<EntityLivingBase> event){
+        Minecraft mc = Minecraft.getMinecraft();
 
-        if(event.getEntity().equals(Minecraft.getMinecraft().player))
+        if(event.getEntity().equals(mc.player))
+            return;
+
+        if(mc.gameSettings.thirdPersonView != 0)
+            return;
+
+        if(mc.gameSettings.hideGUI)
             return;
 
         isDead = false;
@@ -64,7 +71,7 @@ public class ThermalEntityRender {
         }
 
         // get distance to player
-        currentDistance = event.getEntity().getPositionVector().distanceTo(Minecraft.getMinecraft().player.getPositionVector());
+        currentDistance = event.getEntity().getPositionVector().distanceTo(mc.player.getPositionVector());
 
         // reenable depth testing (which gets disabled in outline renderer)
         GlStateManager.depthMask(true);
@@ -114,7 +121,7 @@ public class ThermalEntityRender {
         // restore overlay for next render events
         Minecraft mc = Minecraft.getMinecraft();
 
-        //mc.getFramebuffer().bindFramebuffer(true);
+        mc.getFramebuffer().bindFramebuffer(true);
 
         GlStateManager.alphaFunc(516, 0.1F);
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);

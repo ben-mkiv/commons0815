@@ -49,7 +49,7 @@ public class ShaderHelper {
         framebufferResolution = new ScaledResolution(mc);
 
         thermalEntityRendererOverlay = new ThermalEntityRenderer(resourceLocationShaderOverlay, mc.getFramebuffer());
-        thermalEntityRendererBlur = new ThermalEntityRenderer(resourceLocationShaderBlur, new Framebuffer(framebufferResolution.getScaledWidth(), framebufferResolution.getScaledHeight(), true));
+        thermalEntityRendererBlur = new ThermalEntityRenderer(resourceLocationShaderBlur, new Framebuffer(mc.displayWidth, mc.displayHeight, true));
     }
 
     public static void render(RenderGameOverlayEvent event){
@@ -60,6 +60,12 @@ public class ShaderHelper {
             || event.getResolution().getScaledHeight() != framebufferResolution.getScaledHeight()){
             resetFramebuffers();
         }
+
+
+        GlStateManager.depthMask(false);
+        GlStateManager.enableDepth();
+        GlStateManager.enableTexture2D();
+
 
         // apply color overlay shader
         thermalEntityRendererOverlay.render(event.getPartialTicks());
