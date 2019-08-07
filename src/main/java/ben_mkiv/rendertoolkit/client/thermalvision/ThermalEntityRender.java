@@ -3,8 +3,6 @@ package ben_mkiv.rendertoolkit.client.thermalvision;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.shader.Framebuffer;
-import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -15,8 +13,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Map;
-
 public class ThermalEntityRender {
 
     ThermalEntityRender(){
@@ -25,6 +21,8 @@ public class ThermalEntityRender {
 
     private static double currentDistance = 0;
     private static boolean isDead = false;
+
+    private static boolean overlayVisible = true;
 
     public static final VazkiiShaderHelper.ShaderCallback callback = shader -> {
         if(isDead){
@@ -44,6 +42,7 @@ public class ThermalEntityRender {
         ARBShaderObjects.glUniform1fARB(OpenGlHelper.glGetUniformLocation(shader, name), val);
     }
 
+
     @SubscribeEvent
     public void preRender(RenderLivingEvent.Pre<EntityLivingBase> event){
         Minecraft mc = Minecraft.getMinecraft();
@@ -51,10 +50,9 @@ public class ThermalEntityRender {
         if(event.getEntity().equals(mc.player))
             return;
 
-        if(mc.gameSettings.thirdPersonView != 0)
-            return;
+        overlayVisible = mc.gameSettings.thirdPersonView == 0 && !mc.gameSettings.hideGUI;
 
-        if(mc.gameSettings.hideGUI)
+        if(!overlayVisible)
             return;
 
         isDead = false;
@@ -96,6 +94,9 @@ public class ThermalEntityRender {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void renderFogEvent(EntityViewRenderEvent.FogDensity event) {
+        if(!overlayVisible)
+            return;
+
         event.setDensity(0.03f);
         GlStateManager.setFog(GlStateManager.FogMode.EXP2);
         event.setCanceled(true);
@@ -103,17 +104,20 @@ public class ThermalEntityRender {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void renderFogEvent(EntityViewRenderEvent.FogColors event) {
+        if(!overlayVisible)
+            return;
+
         event.setRed(0.2f);
         event.setGreen(0.4f);
         event.setBlue(0.85f);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onRenderGameOverlay(RenderGameOverlayEvent.Pre evt) {
+    public void onRenderGameOverlay(RenderGameOverlayEvent.Post evt) {
         if (evt.getType() != RenderGameOverlayEvent.ElementType.HELMET)
             return;
 
-        if(Minecraft.getMinecraft().gameSettings.thirdPersonView != 0)
+        if(!overlayVisible)
             return;
 
         ShaderHelper.render(evt);

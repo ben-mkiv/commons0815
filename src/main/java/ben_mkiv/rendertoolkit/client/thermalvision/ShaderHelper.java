@@ -62,7 +62,7 @@ public class ShaderHelper {
         }
 
         // apply color overlay shader
-        thermalEntityRendererOverlay.render(event.getPartialTicks());
+        thermalEntityRendererOverlay.getShaderGroup().render(event.getPartialTicks());
 
         // apply blur to entities
         thermalEntityRendererBlur.getShaderGroup().render(event.getPartialTicks());

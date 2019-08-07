@@ -29,13 +29,4 @@ public class ThermalEntityRenderer extends EntityRenderer {
         }
     }
 
-    public void render(float partialTicks){
-        shaderGroup.render(partialTicks);
-
-        //clearFramebuffer();
-    }
-
-    public void clearFramebuffer(){
-        framebuffer.framebufferClear();
-    }
 }
