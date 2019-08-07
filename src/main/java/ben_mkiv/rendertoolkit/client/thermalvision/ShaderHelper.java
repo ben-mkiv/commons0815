@@ -14,7 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ShaderHelper {
-    public static boolean isActive = false;
+    private static boolean isActive = false;
 
     private static ResourceLocation resourceLocationShaderOverlay = new ResourceLocation(renderToolkit.MODID, "shaders/post/thermal_overlay.json");
     private static ResourceLocation resourceLocationShaderBlur = new ResourceLocation(renderToolkit.MODID, "shaders/post/thermal_blur.json");
@@ -61,12 +61,6 @@ public class ShaderHelper {
             resetFramebuffers();
         }
 
-
-        GlStateManager.depthMask(false);
-        GlStateManager.enableDepth();
-        GlStateManager.enableTexture2D();
-
-
         // apply color overlay shader
         thermalEntityRendererOverlay.render(event.getPartialTicks());
 
@@ -79,6 +73,12 @@ public class ShaderHelper {
 
         thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("final").framebufferRenderExt(mc.displayWidth, mc.displayHeight, false);
         thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("in").framebufferClear();
+
+        GlStateManager.disableBlend();
+    }
+
+    public static boolean isActive(){
+        return isActive;
     }
 
 }
