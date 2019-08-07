@@ -123,6 +123,8 @@ public class ThermalEntityRender {
 
         mc.getFramebuffer().bindFramebuffer(true);
 
+        GlStateManager.enableBlend();
+        GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(516, 0.1F);
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
