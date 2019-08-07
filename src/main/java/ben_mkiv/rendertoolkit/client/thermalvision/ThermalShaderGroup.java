@@ -18,7 +18,8 @@ public class ThermalShaderGroup extends ShaderGroup {
     @Override
     public void addFramebuffer(String name, int width, int height){
         Framebuffer framebuffer = new ThermalFramebuffer(width, height, true);
-        framebuffer.setFramebufferColor(0.2F, 0.3F, 0.9F, 0.5F);
+        //framebuffer.setFramebufferColor(0.2F, 0.3F, 1F, 0.5F);
+        framebuffer.setFramebufferColor(0, 0, 0, 0);
 
         this.mapFramebuffers.put(name, framebuffer);
 

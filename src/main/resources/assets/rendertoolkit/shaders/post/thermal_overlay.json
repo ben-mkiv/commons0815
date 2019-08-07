@@ -1,0 +1,19 @@
+{
+  "targets": [
+    "swap2"
+  ],
+  "passes": [
+
+    {
+      "name": "rendertoolkit:thermal_overlay",
+      "intarget": "minecraft:main",
+      "outtarget": "swap2",
+      "uniforms": []
+    },
+    {
+      "name": "blit",
+      "intarget": "swap2",
+      "outtarget": "minecraft:main"
+    }
+  ]
+}

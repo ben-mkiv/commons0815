@@ -310,7 +310,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 					return true;
 
 				offset.add(pos);
-				if(!utilsCommon.inRange(Minecraft.getMinecraft().player, new Vec3d(offset.x, offset.y, offset.z), viewDistance))
+				if(Minecraft.getMinecraft().player.getPositionVector().distanceTo(new Vec3d(offset.x, offset.y, offset.z)) > viewDistance)
 					return false;
 			}
 

@@ -1,74 +1,78 @@
 package ben_mkiv.rendertoolkit.client.thermalvision;
 
 import ben_mkiv.rendertoolkit.renderToolkit;
-import com.google.gson.JsonSyntaxException;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.shader.ShaderGroup;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.io.IOException;
-
+@SideOnly(Side.CLIENT)
 public class ShaderHelper {
-    public enum ShaderType { VANILLA_GLOW, THERMAL_VISION }
+    public static boolean isActive = false;
 
-    public static ShaderType activeShader = ShaderType.VANILLA_GLOW;
+    private static ResourceLocation resourceLocationShaderOverlay = new ResourceLocation(renderToolkit.MODID, "shaders/post/thermal_overlay.json");
+    private static ResourceLocation resourceLocationShaderBlur = new ResourceLocation(renderToolkit.MODID, "shaders/post/thermal_blur.json");
 
-    static ThermalEntityRender renderEventHandler = new ThermalEntityRender();
+    private static ScaledResolution framebufferResolution;
 
-    public static void loadOutlineShader(ShaderType type){
-        if (!OpenGlHelper.shadersSupported || type.equals(activeShader))
+    private static ThermalEntityRender renderEventHandler = new ThermalEntityRender();
+
+    private static ThermalEntityRenderer thermalEntityRendererOverlay = null;
+    static ThermalEntityRenderer thermalEntityRendererBlur = null;
+
+    public static void setupThermalShader(boolean activate){
+        if (!OpenGlHelper.shadersSupported)
             return;
 
-        ResourceLocation resourcelocation;
+        if(activate) {
+            if(thermalEntityRendererOverlay == null || thermalEntityRendererBlur == null)
+                resetFramebuffers();
 
-        switch(type){
-            case THERMAL_VISION:
-                resourcelocation = new ResourceLocation(renderToolkit.MODID, "shaders/post/thermal.json");
-                break;
-
-            default:
-            case VANILLA_GLOW:
-                resourcelocation = new ResourceLocation("shaders/post/entity_outline.json");
-                break;
+            MinecraftForge.EVENT_BUS.register(renderEventHandler);
         }
+        else {
+            MinecraftForge.EVENT_BUS.unregister(renderEventHandler);
+        }
+
+        isActive = activate;
+    }
+
+    private static void resetFramebuffers(){
+        Minecraft mc = Minecraft.getMinecraft();
+
+        framebufferResolution = new ScaledResolution(mc);
+
+        thermalEntityRendererOverlay = new ThermalEntityRenderer(resourceLocationShaderOverlay, mc.getFramebuffer());
+        thermalEntityRendererBlur = new ThermalEntityRenderer(resourceLocationShaderBlur, new Framebuffer(framebufferResolution.getScaledWidth(), framebufferResolution.getScaledHeight(), true));
+    }
+
+    public static void render(RenderGameOverlayEvent event){
+        if(thermalEntityRendererOverlay == null || thermalEntityRendererBlur == null)
+            return;
+
+        if(event.getResolution().getScaledWidth() != framebufferResolution.getScaledWidth()
+            || event.getResolution().getScaledHeight() != framebufferResolution.getScaledHeight()){
+            resetFramebuffers();
+        }
+
+        // apply color overlay shader
+        thermalEntityRendererOverlay.render(event.getPartialTicks());
+
+        // apply blur to entities
+        thermalEntityRendererBlur.getShaderGroup().render(event.getPartialTicks());
 
         Minecraft mc = Minecraft.getMinecraft();
-        RenderGlobal rg = Minecraft.getMinecraft().renderGlobal;
+        mc.getFramebuffer().bindFramebuffer(false);
+        GlStateManager.enableBlend();
 
-        if(type.equals(ShaderType.VANILLA_GLOW)) {
-            for (Entity entity : ThermalEntityRender.forceGlowingEntities)
-                entity.setGlowing(false);
-
-            ThermalEntityRender.forceGlowingEntities.clear();
-        }
-
-        try {
-            switch(type){
-                case THERMAL_VISION:
-                    rg.entityOutlineShader = new ThermalShaderGroup(mc.getTextureManager(), mc.getResourceManager(), mc.getFramebuffer(), resourcelocation);
-                    MinecraftForge.EVENT_BUS.register(renderEventHandler);
-                    break;
-
-                default:
-                case VANILLA_GLOW:
-                    rg.entityOutlineShader = new ShaderGroup(mc.getTextureManager(), mc.getResourceManager(), mc.getFramebuffer(), resourcelocation);
-                    MinecraftForge.EVENT_BUS.unregister(renderEventHandler);
-                    break;
-            }
-
-            rg.entityOutlineShader.createBindFramebuffers(mc.displayWidth, mc.displayHeight);
-            rg.entityOutlineFramebuffer = rg.entityOutlineShader.getFramebufferRaw("final");
-
-            activeShader = type;
-        }
-        catch (IOException|JsonSyntaxException exception){
-            System.out.println("Failed to replace glow shader");
-            rg.entityOutlineShader = null;
-            rg.entityOutlineFramebuffer = null;
-        }
+        thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("final").framebufferRenderExt(mc.displayWidth, mc.displayHeight, false);
+        thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("in").framebufferClear();
     }
+
 }

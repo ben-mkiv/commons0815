@@ -1,0 +1,14 @@
+{
+  "targets": [
+    "in",
+    "final"
+  ],
+  "passes": [
+    {
+      "name": "rendertoolkit:thermal_blur",
+      "intarget": "in",
+      "outtarget": "final",
+      "uniforms": []
+    }
+  ]
+}

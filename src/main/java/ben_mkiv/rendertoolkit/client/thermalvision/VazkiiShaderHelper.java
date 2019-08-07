@@ -88,24 +88,19 @@ public final class VazkiiShaderHelper {
 
 
     private static int createProgram(String vert, String frag) {
+        int program = ARBShaderObjects.glCreateProgramObjectARB();
 
-        int vertId = 0, fragId = 0, program;
-        if(vert != null)
-            vertId = createShader(vert, VERT);
-        if(frag != null)
-            fragId = createShader(frag, FRAG);
-
-        program = ARBShaderObjects.glCreateProgramObjectARB();
         if(program == 0)
             return 0;
 
-        if(vert != null)
-            ARBShaderObjects.glAttachObjectARB(program, vertId);
-        if(frag != null)
-            ARBShaderObjects.glAttachObjectARB(program, fragId);
+        if(vert != null) {
+            ARBShaderObjects.glAttachObjectARB(program, createShader(vert, VERT));
+        }
+        if(frag != null) {
+            ARBShaderObjects.glAttachObjectARB(program, createShader(frag, FRAG));
+        }
 
         ARBShaderObjects.glLinkProgramARB(program);
-
 
         if(ARBShaderObjects.glGetObjectParameteriARB(program, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB) == GL11.GL_FALSE) {
             System.out.println(getLogInfo(program));
