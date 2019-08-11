@@ -5,7 +5,6 @@ import ben_mkiv.commons0815.utils.utilsCommon;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IEasing;
 import ben_mkiv.rendertoolkit.common.widgets.core.modifiers.*;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.Vec3d;
 
