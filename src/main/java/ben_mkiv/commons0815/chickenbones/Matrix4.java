@@ -519,9 +519,9 @@ public class Matrix4
         m33 = mat.m33;
         return this;
     }
-    public void apply(Matrix4 mat)
+    public Matrix4 apply(Matrix4 mat)
     {
-        mat.multiply(this);
+        return mat.multiply(this);
     }
     private void mult3x3(Vector3f vec)
     {
@@ -532,12 +532,13 @@ public class Matrix4
         vec.y = (float)y;
         vec.z = (float)z;
     }
-    public void apply(Vector3f vec)
+    public Vector3f apply(Vector3f vec)
     {
         mult3x3(vec);
         vec.x += m03;
         vec.y += m13;
         vec.z += m23;
+        return vec;
     }
     private Vec3d mult3x3(Vec3d vec)
     {

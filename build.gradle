@@ -64,6 +64,8 @@ repositories {
 
 dependencies {
     provided  "li.cil.oc:OpenComputers:${opencomputers_version}"
+
+    compile fileTree(include: ['*.jar'], dir: 'libs')
 }
 
 processResources {

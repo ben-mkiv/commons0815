@@ -1,5 +1,6 @@
 package ben_mkiv.rendertoolkit;
 
+import ben_mkiv.rendertoolkit.client.OptifineHelper;
 import ben_mkiv.rendertoolkit.network.rTkNetwork;
 import ben_mkiv.rendertoolkit.proxy.CommonProxy;
 
@@ -43,8 +44,9 @@ public class renderToolkit
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event){
-        Optifine = Loader.isModLoaded("optifine");
+        Optifine = OptifineHelper.getOptifineShadersClass() != null;
         Albedo = Loader.isModLoaded("albedo");
         proxy.postInit();
     }
+
 }
