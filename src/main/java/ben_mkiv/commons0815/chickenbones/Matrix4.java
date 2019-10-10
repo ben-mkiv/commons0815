@@ -11,6 +11,10 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.nio.DoubleBuffer;
 
+// IF IT DOESNT COMPILE
+// remove javax.vecmath.Matrix4f stuff from the Optifine jar, because fuck optifine closed source bullshit that no one can relate to
+
+
 /**
  * Copyright (C) 2013 Chicken-Bones
  This library is free software; you can redistribute it and/or

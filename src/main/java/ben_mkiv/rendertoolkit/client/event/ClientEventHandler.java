@@ -1,13 +1,10 @@
 package ben_mkiv.rendertoolkit.client.event;
 
 import ben_mkiv.rendertoolkit.client.interactGuiScreen;
-import ben_mkiv.rendertoolkit.client.thermalvision.ShaderHelper;
 import ben_mkiv.rendertoolkit.network.EventType;
 import ben_mkiv.rendertoolkit.renderToolkit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;

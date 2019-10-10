@@ -1,25 +1,23 @@
 package ben_mkiv.rendertoolkit.client;
 
-import net.optifine.shaders.Program;
-import net.optifine.shaders.Shaders;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.nio.IntBuffer;
 
-public class OptifineHelper {
+public class OptifineHelperReflection {
     private static int depthBuffer = Integer.MAX_VALUE;
     private static int shaderObject = 36071;
     private static int optifineFramebuffer = Integer.MAX_VALUE;
     private static int optifineShadowFramebuffer = Integer.MAX_VALUE;
     private static IntBuffer optifineDrawbuffers;
+    private static Field shaderPackLoadedField;
+    private static Field isShadowPassField;
 
-    private static Program lastShaderProgram;
+    private static Field activeShaderField;
 
     private static Class optifineShadersClass;
 
@@ -33,15 +31,18 @@ public class OptifineHelper {
     }
 
     public static void releaseShaderProgram(){
+        //shaderObject = GL11.glGetInteger(ARBShaderObjects.GL_SHADER_OBJECT_ARB);
+
+        //int currentFB = GL11.glGetInteger(GL11.GL_DRAW_BUFFER);
+
+
+
         // unbind shader program
-        //ARBShaderObjects.glUseProgramObjectARB(0);
-        lastShaderProgram = Shaders.activeProgram;
-        Shaders.useProgram(Shaders.ProgramNone);
+        ARBShaderObjects.glUseProgramObjectARB(0);
     }
 
     public static void bindOptifineShadowFramebuffer(){
-        //ARBShaderObjects.glUseProgramObjectARB(shaderObject);
-        Shaders.useProgram(lastShaderProgram);
+        ARBShaderObjects.glUseProgramObjectARB(shaderObject);
 
         if(getOptifineShadowFramebufferLocation() != Integer.MAX_VALUE){
             EXTFramebufferObject.glBindFramebufferEXT(36160, getOptifineShadowFramebufferLocation());
@@ -73,10 +74,63 @@ public class OptifineHelper {
             GL20.glDrawBuffers(getOptifineDrawbuffers());
             GL11.glReadBuffer(0);
         }
+
+        /*
+        try {
+            Field usedColorBuffers = optifineShadersClass.getDeclaredField("usedColorBuffers");
+            usedColorBuffers.setAccessible(true);
+
+            for(int i = 0; i < (int) usedColorBuffers.get(optifineShadersClass); ++i) {
+
+
+                try {
+                    Field dfbColorTexturesA_field = optifineShadersClass.getDeclaredField("dfbColorTexturesA");
+                    dfbColorTexturesA_field.setAccessible(true);
+                    int[] dfbColorTexturesA = (int []) dfbColorTexturesA_field.get(optifineShadersClass);
+
+                    EXTFramebufferObject.glFramebufferTexture2DEXT(36160, '賠' + i, 3553, dfbColorTexturesA[i], 0);
+                } catch (Exception ex){}
+
+
+            }
+
+        } catch (Exception ex){}
+        */
+
+        //EXTFramebufferObject.glBindFramebufferEXT(36160, Shaders.dfb);
+
+        //beginTranslucent();
+
+        //if(drawBuffers != null)
+        //    GL20.glDrawBuffers(drawBuffers);
+
+        //OpenGlHelper.glFramebufferRenderbuffer(OpenGlHelper.GL_FRAMEBUFFER, OpenGlHelper.GL_DEPTH_ATTACHMENT, OpenGlHelper.GL_RENDERBUFFER, shaderObject);
+
+        //OpenGlHelper.glBindBuffer(OpenGlHelper.GL_FB_INCOMPLETE_READ_BUFFER, readBuff);
+        //OpenGlHelper.glBindBuffer(OpenGlHelper.GL_FB_INCOMPLETE_DRAW_BUFFER, drawBuff);
+
+        //OpenGlHelper.glBindRenderbuffer(OpenGlHelper.GL_RENDERBUFFER, readFboId);
     }
 
     public static boolean isShadowPass(){
-        return Shaders.isShadowPass;
+        if(isShadowPassField == null) {
+            try {
+                isShadowPassField = optifineShadersClass.getDeclaredField("isShadowPass");
+                isShadowPassField.setAccessible(true);
+            } catch (Exception ex) {
+                System.out.println("reflection of Optifine isShadowPass field failed");
+            }
+        }
+
+        if(isShadowPassField != null){
+            try {
+                return (boolean) isShadowPassField.get(optifineShadersClass);
+            } catch (Exception ex) {
+                System.out.println("reflection of Optifine isShadowPass failed");
+            }
+        }
+
+        return false;
     }
 
 
@@ -134,11 +188,6 @@ public class OptifineHelper {
             }
         }
 
-        try {
-            MethodHandle foo = MethodHandles.lookup().findGetter(optifineShadersClass, "dfbDrawBuffers", IntBuffer.class);
-            return (IntBuffer) foo.invoke();
-        } catch(Throwable ex){}
-
         return optifineDrawbuffers;
     }
 
@@ -156,11 +205,57 @@ public class OptifineHelper {
     }
 
     public static int getActiveProgram(){
-        return Shaders.activeProgramID;
+        int activeProgram = Integer.MAX_VALUE;
+
+        if(activeShaderField == null)
+        {
+            try {
+                activeShaderField = optifineShadersClass.getDeclaredField("activeProgramID");
+                activeShaderField.setAccessible(true);
+            }
+            catch (Exception ex){
+                System.out.println("failed to retrieve optifine shader activeProgramID field");
+            }
+        }
+
+        if(shaderPackLoadedField != null){
+            try {
+                activeProgram = (int) activeShaderField.get(optifineShadersClass);
+            }
+            catch (Exception ex){
+                System.out.println("failed to retrieve optifine activeProgramID");
+            }
+        }
+
+
+        return activeProgram;
     }
 
     public static boolean isShaderActive(){
-        return Shaders.shaderPackLoaded;
+        boolean isActive = false;
+
+        if(shaderPackLoadedField == null)
+        {
+            try {
+                shaderPackLoadedField = optifineShadersClass.getDeclaredField("shaderPackLoaded");
+                shaderPackLoadedField.setAccessible(true);
+            }
+            catch (Exception ex){
+                System.out.println("failed to retrieve optifine shader state field");
+            }
+        }
+
+        if(shaderPackLoadedField != null){
+            try {
+                isActive = (boolean) shaderPackLoadedField.get(optifineShadersClass);
+            }
+            catch (Exception ex){
+                System.out.println("failed to retrieve optifine shader state");
+            }
+        }
+
+
+        return isActive;
     }
 
 }
