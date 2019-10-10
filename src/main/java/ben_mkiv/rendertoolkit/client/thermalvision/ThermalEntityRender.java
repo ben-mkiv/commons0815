@@ -1,5 +1,7 @@
 package ben_mkiv.rendertoolkit.client.thermalvision;
 
+import ben_mkiv.rendertoolkit.client.OptifineHelper;
+import ben_mkiv.rendertoolkit.renderToolkit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -23,6 +25,8 @@ public class ThermalEntityRender {
     private static boolean isDead = false;
 
     private static boolean overlayVisible = true;
+
+    private static boolean isOptifineSpecialCase = false;
 
     public static final VazkiiShaderHelper.ShaderCallback callback = shader -> {
         if(isDead){
@@ -50,6 +54,12 @@ public class ThermalEntityRender {
         if(event.getEntity().equals(mc.player))
             return;
 
+
+        isOptifineSpecialCase = renderToolkit.Optifine && OptifineHelper.isShaderActive();
+
+        if(isOptifineSpecialCase && OptifineHelper.isShadowPass())
+            return;
+
         overlayVisible = mc.gameSettings.thirdPersonView == 0 && !mc.gameSettings.hideGUI;
 
         if(!overlayVisible)
@@ -71,6 +81,9 @@ public class ThermalEntityRender {
         // get distance to player
         currentDistance = event.getEntity().getPositionVector().distanceTo(mc.player.getPositionVector());
 
+        if(isOptifineSpecialCase)
+            OptifineHelper.releaseShaderProgram();
+
         // reenable depth testing (which gets disabled in outline renderer)
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
@@ -84,12 +97,24 @@ public class ThermalEntityRender {
 
         // bind to entity framebuffer
         ShaderHelper.thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("in").bindFramebuffer(true);
+
+        if(isOptifineSpecialCase)
+           OptifineHelper.bindOptifineDepthBuffer();
     }
 
     @SubscribeEvent
     public void postRender(RenderLivingEvent.Post<EntityLivingBase> event){
+
+        if(isOptifineSpecialCase && OptifineHelper.isShadowPass())
+            return;
+
         VazkiiShaderHelper.releaseShader();
+
         Minecraft.getMinecraft().getFramebuffer().bindFramebuffer(true);
+
+        if(isOptifineSpecialCase) {
+            OptifineHelper.bindOptifineFramebuffer();
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -126,6 +151,8 @@ public class ThermalEntityRender {
         Minecraft mc = Minecraft.getMinecraft();
 
         mc.getFramebuffer().bindFramebuffer(true);
+
+        OptifineHelper.bindOptifineDepthBuffer();
 
         GlStateManager.enableBlend();
         GlStateManager.enableAlpha();

@@ -1,5 +1,6 @@
 package ben_mkiv.rendertoolkit.client.thermalvision;
 
+import ben_mkiv.rendertoolkit.client.OptifineHelper;
 import ben_mkiv.rendertoolkit.renderToolkit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -75,6 +76,9 @@ public class ShaderHelper {
         thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("in").framebufferClear();
 
         GlStateManager.disableBlend();
+
+
+
     }
 
     public static boolean isActive(){
