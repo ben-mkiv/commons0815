@@ -138,7 +138,7 @@ public class OptifineHelper {
     }
 
 
-    private static int getOptifineDepthBufferLocation(){
+    public static int getOptifineDepthBufferLocation(){
         if(depthBuffer == Integer.MAX_VALUE) {
             try {
                 Field field = optifineShadersClass.getDeclaredField("dfbDepthTextures");

@@ -138,7 +138,7 @@ public class ThermalEntityRender {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onRenderGameOverlay(RenderGameOverlayEvent.Post evt) {
+    public void onRenderGameOverlay(RenderGameOverlayEvent.Pre evt) {
         if (evt.getType() != RenderGameOverlayEvent.ElementType.HELMET)
             return;
 
@@ -152,7 +152,8 @@ public class ThermalEntityRender {
 
         mc.getFramebuffer().bindFramebuffer(true);
 
-        OptifineHelper.bindOptifineDepthBuffer();
+        if(isOptifineSpecialCase)
+            OptifineHelper.bindOptifineDepthBuffer();
 
         GlStateManager.enableBlend();
         GlStateManager.enableAlpha();
