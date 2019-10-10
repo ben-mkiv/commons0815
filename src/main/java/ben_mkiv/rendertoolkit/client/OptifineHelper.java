@@ -13,6 +13,7 @@ public class OptifineHelper {
     private static int shaderObject = 36071;
     private static int optifineFramebuffer = Integer.MAX_VALUE;
     private static IntBuffer optifineDrawbuffers;
+    private static Field shaderPackLoadedField;
 
     private static Class optifineShadersClass;
 
@@ -149,6 +150,33 @@ public class OptifineHelper {
         }
 
         return optifineShadersClass;
+    }
+
+    public static boolean isShaderActive(){
+        boolean isActive = false;
+
+        if(shaderPackLoadedField == null)
+        {
+            try {
+                shaderPackLoadedField = optifineShadersClass.getDeclaredField("shaderPackLoaded");
+                shaderPackLoadedField.setAccessible(true);
+            }
+            catch (Exception ex){
+                System.out.println("failed to retrieve optifine shader state field");
+            }
+        }
+
+        if(shaderPackLoadedField != null){
+            try {
+                isActive = (boolean) shaderPackLoadedField.get(shaderPackLoadedField);
+            }
+            catch (Exception ex){
+                System.out.println("failed to retrieve optifine shader state");
+            }
+        }
+
+
+        return isActive;
     }
 
 }
