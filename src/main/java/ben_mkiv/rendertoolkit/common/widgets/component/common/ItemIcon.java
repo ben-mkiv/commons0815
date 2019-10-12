@@ -27,13 +27,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.List;
 
 public abstract class ItemIcon extends WidgetGLWorld implements IItem {
-    private ItemStack itmStack = null;
+    private ItemStack itmStack = ItemStack.EMPTY;
     private IBakedModel ibakedmodel = null;
     @Override
     public void writeData(ByteBuf buff) {
         super.writeData(buff);
 
-        if(itmStack != null) {
+        if(!itmStack.isEmpty()) {
             ByteBufUtils.writeUTF8String(buff, itmStack.getItem().getRegistryName().toString());
             buff.writeInt(itmStack.getMetadata());
         }
@@ -78,7 +78,7 @@ public abstract class ItemIcon extends WidgetGLWorld implements IItem {
     private class RenderableItemIcon extends RenderableGLWidget{
         @Override
         public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
-            if(itmStack == null) return;
+            if(itmStack.isEmpty()) return;
             if(ibakedmodel == null) ibakedmodel = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getItemModel(itmStack);
 
             TextureManager tm = Minecraft.getMinecraft().getTextureManager();

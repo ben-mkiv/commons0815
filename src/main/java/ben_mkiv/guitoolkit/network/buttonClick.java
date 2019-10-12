@@ -22,7 +22,7 @@ public class buttonClick implements IMessage {
 
     @SideOnly(Side.CLIENT)
     public buttonClick(GuiButton button){
-        this.dimId = guiHandler.player.dimension;
+        this.dimId = Minecraft.getMinecraft().player.world.provider.getDimension();
         this.playerID = Minecraft.getMinecraft().player.getEntityId();
 
         if(button instanceof prettyButton) {
