@@ -1,7 +1,5 @@
 package ben_mkiv.rendertoolkit.network;
 
-import ben_mkiv.rendertoolkit.network.messages.ClientEventPacket;
-import ben_mkiv.rendertoolkit.network.messages.ClientRequest;
 import ben_mkiv.rendertoolkit.network.messages.WidgetUpdatePacket;
 import ben_mkiv.rendertoolkit.renderToolkit;
 import net.minecraft.entity.Entity;
@@ -26,8 +24,6 @@ public class rTkNetwork {
     public static void init(){
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(renderToolkit.MODID.toLowerCase());
 
-        registerMessage(ClientEventPacket.Handler.class, ClientEventPacket.class, Side.SERVER);
-        registerMessage(ClientRequest.Handler.class, ClientRequest.class, Side.CLIENT);
         registerMessage(WidgetUpdatePacket.Handler.class, WidgetUpdatePacket.class, Side.CLIENT);
     }
 

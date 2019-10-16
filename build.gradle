@@ -32,6 +32,9 @@ minecraft {
     replaceIn "ben_mkiv/guitoolkit/guiToolkit.java"
     replace "@VERSION@", modVersion
 
+    replaceIn "ben_mkiv/commons0815/Commons0815.java"
+    replace "@VERSION@", modVersion
+
     runDir = "run"
     version = "${minecraftVersion}-${forge_version}"
     mappings = mcp_version

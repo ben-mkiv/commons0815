@@ -3,21 +3,14 @@ package ben_mkiv.rendertoolkit.surface;
 import ben_mkiv.commons0815.utils.Location;
 import ben_mkiv.commons0815.utils.PlayerStats;
 import ben_mkiv.rendertoolkit.common.widgets.Widget;
-import ben_mkiv.rendertoolkit.network.messages.ClientEventPacket;
-import ben_mkiv.rendertoolkit.network.messages.ClientRequest;
 import ben_mkiv.rendertoolkit.network.messages.WidgetUpdatePacket;
 import ben_mkiv.rendertoolkit.network.rTkNetwork;
-import ben_mkiv.rendertoolkit.renderToolkit;
 import ben_mkiv.rendertoolkit.server.event.ServerEventHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.util.*;
-import java.util.logging.Logger;
-
-import static ben_mkiv.rendertoolkit.network.messages.ClientRequest.EventType.ASYNC_SCREEN_SIZES;
 
 public class ServerSurface {
     public static ServerEventHandler eventHandler;
@@ -26,11 +19,6 @@ public class ServerSurface {
     //first UUID is the player UUID, hashset is a list of the connected hosts
     public HashMap<UUID, HashSet<UUID>> players = new HashMap<>();
     public HashMap<UUID, PlayerStats> playerStats = new HashMap<>();
-
-    public IMessage onClientEvent(ClientEventPacket message){
-        Logger.getLogger(renderToolkit.MODID).info("default renderToolkit ClientEventPacket handler shouldnt be used");
-        return null;
-    }
 
     public String[] getActivePlayers(UUID uuid){
         LinkedList<String> players = new LinkedList<String>();
@@ -69,11 +57,6 @@ public class ServerSurface {
                     rTkNetwork.channel.sendTo(packet, player);
             }
         }
-    }
-
-    public void requestResolutionEvent(EntityPlayerMP player, UUID instanceUUID){
-        if(player != null)
-            rTkNetwork.channel.sendTo(new ClientRequest(ASYNC_SCREEN_SIZES, instanceUUID), player);
     }
 
     HashMap<UUID, EntityPlayerMP> playerCache = new HashMap<>();

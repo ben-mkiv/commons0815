@@ -25,6 +25,7 @@ public class renderToolkit
     @SidedProxy(clientSide = "ben_mkiv.rendertoolkit.proxy.ClientProxy", serverSide = "ben_mkiv.rendertoolkit.proxy.CommonProxy")
     public static CommonProxy proxy;
 
+    @Mod.Instance(value = MODID)
     public static renderToolkit instance;
 
     @EventHandler

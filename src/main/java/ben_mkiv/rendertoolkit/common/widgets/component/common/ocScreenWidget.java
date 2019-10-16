@@ -31,6 +31,7 @@ public abstract class ocScreenWidget extends WidgetGLWorld implements IScreen {
             this.preRender(conditionStates);
             Color col = new Color(this.applyModifiers(conditionStates));
 
+            GlStateManager.pushAttrib();
             GlStateManager.enableTexture2D();
             screen.buffer().renderText();
 
@@ -43,7 +44,7 @@ public abstract class ocScreenWidget extends WidgetGLWorld implements IScreen {
             }
 
             this.postRender();
-
+            GlStateManager.popAttrib();
             GlStateManager.enableTexture2D();
         }
 

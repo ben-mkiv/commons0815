@@ -6,17 +6,27 @@ import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.IntBuffer;
+
+import static ben_mkiv.rendertoolkit.renderToolkit.Optifine;
 
 public class OptifineHelper {
     private static int depthBuffer = Integer.MAX_VALUE;
     private static int optifineFramebuffer = Integer.MAX_VALUE;
     private static IntBuffer optifineDrawbuffers;
 
+
     private static Program lastShaderProgram;
 
-    private static Class optifineShadersClass;
+    private static Class optifineShadersClass = null;
+    private static Class optifineConfigClass = null;
+
+    private static MethodHandle isFastRenderMethodHandle = null;
 
     public static boolean bindOptifineDepthBuffer(){
         if(getOptifineDepthBufferLocation() == Integer.MAX_VALUE)
@@ -33,9 +43,13 @@ public class OptifineHelper {
         Shaders.useProgram(Shaders.ProgramNone);
     }
 
+    public static void rebindShaderProgram(){
+        Shaders.useProgram(lastShaderProgram);
+    }
+
     public static void bindOptifineFramebuffer(){
         // enable previous shader program
-        Shaders.useProgram(lastShaderProgram);
+        rebindShaderProgram();
 
         // rebind previous FB
         if(getOptifineFramebufferLocation() != Integer.MAX_VALUE){
@@ -114,6 +128,19 @@ public class OptifineHelper {
         return optifineShadersClass;
     }
 
+    public static Class getOptifineConfigClass(){
+        if(optifineConfigClass == null){
+            try {
+                optifineConfigClass = Class.forName("Config", true, Shaders.class.getClassLoader());
+            }
+            catch (Exception ex){
+                System.out.println("failed to retrieve optifine config class");
+            }
+        }
+
+        return optifineConfigClass;
+    }
+
     public static boolean isShaderActive(){
         return Shaders.shaderPackLoaded;
     }
@@ -122,4 +149,22 @@ public class OptifineHelper {
         return Shaders.isShadowPass;
     }
 
+    public static boolean isFastRenderEnabled(){
+        if(isFastRenderMethodHandle == null) {
+            try {
+                MethodType mt = MethodType.methodType(boolean.class);
+                isFastRenderMethodHandle = MethodHandles.lookup().findStatic(getOptifineConfigClass(), "isFastRender", mt);
+            } catch (Exception ex) {
+                System.out.println("reflection of Optifine Shader class failed for dfbDrawBuffers");
+                return false;
+            }
+        }
+
+        try {
+            return (boolean) isFastRenderMethodHandle.invokeExact();
+        }
+        catch(Throwable ex){
+            return false;
+        }
+    }
 }

@@ -10,9 +10,6 @@ import ben_mkiv.rendertoolkit.client.event.ClientEventHandler;
 import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.Widget;
 
-import ben_mkiv.rendertoolkit.network.EventType;
-import ben_mkiv.rendertoolkit.network.messages.ClientEventPacket;
-import ben_mkiv.rendertoolkit.network.rTkNetwork;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
@@ -65,22 +62,6 @@ public class ClientRenderer {
 	public void removeAllWidgets(){
 		renderables.clear();
 		renderablesWorld.clear();
-	}
-
-	@SubscribeEvent
-	public void onSizeChange(RenderGameOverlayEvent event) {
-		ScaledResolution newResolution = event.getResolution();
-
-		if  (newResolution.getScaledWidth() != ClientRenderer.resolution.getScaledWidth()
-		 || newResolution.getScaledHeight() != ClientRenderer.resolution.getScaledHeight()
-		 ||  newResolution.getScaleFactor() != ClientRenderer.resolution.getScaleFactor()) {
-			ClientRenderer.resolution = newResolution;
-			sendResolution();
-		}
-	}
-
-	public void sendResolution(){
-		rTkNetwork.channel.sendToServer(new ClientEventPacket(EventType.GLASSES_SCREEN_SIZE, getRenderOffset()));
 	}
 
 	public boolean shouldWidgetBeRendered(EntityPlayer player, IRenderableWidget widget){
