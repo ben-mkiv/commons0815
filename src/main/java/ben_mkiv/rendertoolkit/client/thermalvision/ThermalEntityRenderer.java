@@ -29,4 +29,5 @@ public class ThermalEntityRenderer extends EntityRenderer {
         }
     }
 
+
 }

@@ -3,6 +3,7 @@ package ben_mkiv.rendertoolkit.client.thermalvision;
 import ben_mkiv.rendertoolkit.client.OptifineHelper;
 import ben_mkiv.rendertoolkit.renderToolkit;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -36,9 +37,15 @@ public class ShaderHelper {
                 resetFramebuffers();
 
             MinecraftForge.EVENT_BUS.register(renderEventHandler);
+
+            if(renderToolkit.Optifine && OptifineHelper.isFastRenderEnabled() && fastRenderNotificationTimeout != -1)
+                fastRenderNotificationTimeout = System.currentTimeMillis() + 7000;
+
         }
         else {
             MinecraftForge.EVENT_BUS.unregister(renderEventHandler);
+            if(fastRenderNotificationTimeout != -1)
+                fastRenderNotificationTimeout = 0;
         }
 
         isActive = activate;
@@ -62,27 +69,45 @@ public class ShaderHelper {
             resetFramebuffers();
         }
 
-        // apply color overlay shader
-        thermalEntityRendererOverlay.getShaderGroup().render(event.getPartialTicks());
+        if(!ThermalEntityRender.fastRenderEnabled) {
+            // apply color overlay shader
+            thermalEntityRendererOverlay.getShaderGroup().render(event.getPartialTicks());
 
-        // apply blur to entities
-        thermalEntityRendererBlur.getShaderGroup().render(event.getPartialTicks());
+            // apply blur to entities
+            thermalEntityRendererBlur.getShaderGroup().render(event.getPartialTicks());
+        }
 
         Minecraft mc = Minecraft.getMinecraft();
         mc.getFramebuffer().bindFramebuffer(false);
         GlStateManager.enableBlend();
 
         thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("final").framebufferRenderExt(mc.displayWidth, mc.displayHeight, false);
-        thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("in").framebufferClear();
+
+        if(!ThermalEntityRender.fastRenderEnabled)
+            thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("in").framebufferClear();
 
         GlStateManager.disableBlend();
-
-
-
     }
 
     public static boolean isActive(){
         return isActive;
+    }
+
+    private static long fastRenderNotificationTimeout = 0;
+
+    public static void renderFastRenderNotification(){
+        if(!ThermalEntityRender.fastRenderEnabled || fastRenderNotificationTimeout <= 0)
+            return;
+
+        if(System.currentTimeMillis() > fastRenderNotificationTimeout)
+            fastRenderNotificationTimeout = -1;
+
+        ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
+        String text = "ThermalVision is best experienced with Optifine FastRender disabled";
+        FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+        int x = res.getScaledWidth() / 2 - fr.getStringWidth(text) / 2;
+        int y = res.getScaledHeight() / 2 - 2 * fr.FONT_HEIGHT;
+        fr.drawString(text, x, y, 0xFFFFFF);
     }
 
 }

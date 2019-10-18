@@ -3,6 +3,8 @@ package ben_mkiv.rendertoolkit.client.thermalvision;
 import ben_mkiv.rendertoolkit.client.OptifineHelper;
 import ben_mkiv.rendertoolkit.renderToolkit;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.EntityLivingBase;
@@ -27,6 +29,8 @@ public class ThermalEntityRender {
     private static boolean overlayVisible = true;
 
     private static boolean isOptifineSpecialCase = false;
+    protected static boolean fastRenderEnabled = false;
+
 
     public static final VazkiiShaderHelper.ShaderCallback callback = shader -> {
         if(isDead){
@@ -54,11 +58,12 @@ public class ThermalEntityRender {
         if(event.getEntity().equals(mc.player))
             return;
 
-
         isOptifineSpecialCase = renderToolkit.Optifine && OptifineHelper.isShaderActive();
 
         if(isOptifineSpecialCase && OptifineHelper.isShadowPass())
             return;
+
+        fastRenderEnabled = !isOptifineSpecialCase && renderToolkit.Optifine && OptifineHelper.isFastRenderEnabled();
 
         overlayVisible = mc.gameSettings.thirdPersonView == 0 && !mc.gameSettings.hideGUI;
 
@@ -104,7 +109,6 @@ public class ThermalEntityRender {
 
     @SubscribeEvent
     public void postRender(RenderLivingEvent.Post<EntityLivingBase> event){
-
         if(isOptifineSpecialCase && OptifineHelper.isShadowPass())
             return;
 
@@ -141,6 +145,8 @@ public class ThermalEntityRender {
     public void onRenderGameOverlay(RenderGameOverlayEvent.Pre evt) {
         if (evt.getType() != RenderGameOverlayEvent.ElementType.HELMET)
             return;
+
+        ShaderHelper.renderFastRenderNotification();
 
         if(!overlayVisible)
             return;
