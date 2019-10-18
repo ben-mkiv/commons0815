@@ -3,8 +3,6 @@ package ben_mkiv.rendertoolkit.client.thermalvision;
 import ben_mkiv.rendertoolkit.client.OptifineHelper;
 import ben_mkiv.rendertoolkit.renderToolkit;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.EntityLivingBase;
