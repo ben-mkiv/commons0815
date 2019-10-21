@@ -108,13 +108,6 @@ public class OptifineHelper {
         return optifineDrawbuffers;
     }
 
-    /*
-        try {
-            MethodHandle foo = MethodHandles.lookup().findGetter(optifineShadersClass, "dfbDrawBuffers", IntBuffer.class);
-            return (IntBuffer) foo.invoke();
-        } catch(Throwable ex){}
-    * */
-
     public static Class getOptifineShadersClass(){
         if(optifineShadersClass == null){
             try {
