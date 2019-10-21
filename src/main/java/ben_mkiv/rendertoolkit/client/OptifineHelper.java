@@ -1,5 +1,6 @@
 package ben_mkiv.rendertoolkit.client;
 
+import ben_mkiv.rendertoolkit.client.thermalvision.ShaderHelper;
 import net.optifine.shaders.Program;
 import net.optifine.shaders.Shaders;
 import org.lwjgl.opengl.EXTFramebufferObject;
@@ -10,10 +11,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.IntBuffer;
-
-import static ben_mkiv.rendertoolkit.renderToolkit.Optifine;
 
 public class OptifineHelper {
     private static int depthBuffer = Integer.MAX_VALUE;
@@ -25,6 +23,8 @@ public class OptifineHelper {
 
     private static Class optifineShadersClass = null;
     private static Class optifineConfigClass = null;
+
+    private static boolean wasFastRenderEnabled = false;
 
     private static MethodHandle isFastRenderMethodHandle = null;
 
@@ -155,13 +155,21 @@ public class OptifineHelper {
                 MethodType mt = MethodType.methodType(boolean.class);
                 isFastRenderMethodHandle = MethodHandles.lookup().findStatic(getOptifineConfigClass(), "isFastRender", mt);
             } catch (Exception ex) {
-                System.out.println("reflection of Optifine Shader class failed for dfbDrawBuffers");
+                System.out.println("reflection of Optifine Shader class failed for isFastRender() method");
                 return false;
             }
         }
 
         try {
-            return (boolean) isFastRenderMethodHandle.invokeExact();
+            boolean isFastRenderEnabled = (boolean) isFastRenderMethodHandle.invokeExact();
+            if(isFastRenderEnabled != wasFastRenderEnabled){
+                depthBuffer = Integer.MAX_VALUE;
+                optifineFramebuffer = Integer.MAX_VALUE;
+                optifineDrawbuffers = null;
+                ShaderHelper.resetFramebuffers();
+                wasFastRenderEnabled = isFastRenderEnabled;
+            }
+            return isFastRenderEnabled;
         }
         catch(Throwable ex){
             return false;

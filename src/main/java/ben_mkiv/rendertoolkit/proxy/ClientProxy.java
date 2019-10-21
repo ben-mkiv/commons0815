@@ -1,6 +1,8 @@
 package ben_mkiv.rendertoolkit.proxy;
 
 import ben_mkiv.commons0815.utils.PlayerStats;
+import ben_mkiv.rendertoolkit.client.OptifineHelper;
+import ben_mkiv.rendertoolkit.renderToolkit;
 import ben_mkiv.rendertoolkit.surface.ClientSurface;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -8,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -28,7 +31,8 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void postInit() {
-        //ManualPathProvider.initialize();
+        renderToolkit.Optifine = OptifineHelper.getOptifineShadersClass() != null;
+        renderToolkit.Albedo = Loader.isModLoaded("albedo");
     }
 
     @Override

@@ -1,11 +1,9 @@
 package ben_mkiv.rendertoolkit;
 
-import ben_mkiv.rendertoolkit.client.OptifineHelper;
 import ben_mkiv.rendertoolkit.network.rTkNetwork;
 import ben_mkiv.rendertoolkit.proxy.CommonProxy;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -45,8 +43,6 @@ public class renderToolkit
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event){
-        Optifine = OptifineHelper.getOptifineShadersClass() != null;
-        Albedo = Loader.isModLoaded("albedo");
         proxy.postInit();
     }
 

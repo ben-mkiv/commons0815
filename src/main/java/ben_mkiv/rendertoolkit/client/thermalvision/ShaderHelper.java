@@ -51,7 +51,7 @@ public class ShaderHelper {
         isActive = activate;
     }
 
-    private static void resetFramebuffers(){
+    public static void resetFramebuffers(){
         Minecraft mc = Minecraft.getMinecraft();
 
         framebufferResolution = new ScaledResolution(mc);
@@ -63,6 +63,7 @@ public class ShaderHelper {
     public static void render(RenderGameOverlayEvent event){
         if(thermalEntityRendererOverlay == null || thermalEntityRendererBlur == null)
             return;
+
 
         if(event.getResolution().getScaledWidth() != framebufferResolution.getScaledWidth()
             || event.getResolution().getScaledHeight() != framebufferResolution.getScaledHeight()){
