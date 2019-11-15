@@ -20,8 +20,8 @@ public abstract class CustomShape extends WidgetGLWorld implements ICustomShape 
     private HashMap<Integer, ArrayList> vectors, vectorsCache;
     private ArrayList<ArrayList> triangleCache = new ArrayList<>();
     private boolean updateCache = true;
-    private boolean gl_strips;
-    private boolean smooth_shading;
+    public boolean gl_strips;
+    public boolean smooth_shading;
 
     public CustomShape() {
         vectors = new HashMap<>();
