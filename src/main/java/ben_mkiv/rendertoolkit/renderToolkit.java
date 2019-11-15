@@ -37,7 +37,6 @@ public class renderToolkit
     @EventHandler
     public void init(FMLInitializationEvent event){
         rTkNetwork.init();
-
         proxy.init();
     }
 

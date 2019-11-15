@@ -40,6 +40,11 @@ minecraft {
     mappings = mcp_version
 }
 
+
+sourceSets {
+    create("optifine_dummy")
+}
+
 runClient {
     jvmArgs '-Dfml.coreMods.load=li.cil.oc.common.launch.TransformerLoader'
 }
@@ -68,7 +73,7 @@ repositories {
 dependencies {
     provided  "li.cil.oc:OpenComputers:${opencomputers_version}"
 
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compileOnly(sourceSets["optifine_dummy"].output)
 }
 
 processResources {
@@ -76,6 +81,8 @@ processResources {
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
 
+    exclude("net/optifine/**/*")
+    
     // replace stuff in mcmod.entityInfo, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'

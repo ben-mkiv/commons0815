@@ -12,14 +12,19 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public abstract class CustomShape extends WidgetGLWorld implements ICustomShape {
-    public ArrayList<ArrayList> vectors;
-    public boolean gl_strips;
-    public boolean smooth_shading;
+    private HashMap<Integer, ArrayList> vectors, vectorsCache;
+    private ArrayList<ArrayList> triangleCache = new ArrayList<>();
+    private boolean updateCache = true;
+    private boolean gl_strips;
+    private boolean smooth_shading;
 
     public CustomShape() {
-        vectors = new ArrayList<ArrayList>();
+        vectors = new HashMap<>();
         gl_strips = false;
         smooth_shading = false;
     }
@@ -28,26 +33,70 @@ public abstract class CustomShape extends WidgetGLWorld implements ICustomShape 
         return this.vectors.size();
     }
 
+    private void syncCache(){
+        if(!updateCache)
+            return;
+
+        vectorsCache = new HashMap<>(vectors);
+
+        if(!gl_strips){
+            triangleCache = new ArrayList<>();
+            ArrayList<ArrayList> triangle = new ArrayList<>();
+
+            for(ArrayList vector : vectorsCache.values()){
+                if(triangle.size() == 3) {
+                    triangleCache.add(triangle);
+                    triangle = new ArrayList<>();
+                }
+
+                triangle.add(vector);
+            }
+
+        }
+
+        updateCache = false;
+    }
+
     public void setVertex(int n, float nx, float ny, float nz){
-        if(getVertexCount() <= n) {
+        if(vectors.containsKey(n)) {
             vectors.get(n).set(0, nx);
             vectors.get(n).set(1, ny);
             vectors.get(n).set(2, nz);
+
+            updateCache = true;
         }
-        else addVertex(nx, ny, nz);
+        else
+            addVertex(nx, ny, nz);
     }
 
-    public void addVertex(float nx, float ny, float nz){
-        ArrayList<Float> vector = new ArrayList<Float>();
+    public int addVertex(float nx, float ny, float nz){
+        ArrayList<Float> vector = new ArrayList<>();
         vector.add(nx);
         vector.add(ny);
         vector.add(nz);
-        this.vectors.add(vector);
+        int index = getVertexIndex();
+
+        this.vectors.put(index, vector);
+
+        updateCache = true;
+
+        return index;
+    }
+
+    private int getVertexIndex(){
+        int index = 0;
+        for(int vertIndex : new HashSet<>(vectors.keySet()))
+            if(vertIndex > index)
+                index = vertIndex;
+
+        return index + 1;
     }
 
     public void removeVertex(int n){
-        if(getVertexCount() <= n)
+        if(vectors.containsKey(n)) {
             this.vectors.remove(n);
+            updateCache = true;
+        }
     }
 
     @Override
@@ -56,11 +105,15 @@ public abstract class CustomShape extends WidgetGLWorld implements ICustomShape 
 
         buff.writeBoolean(gl_strips);
 
+        HashMap<Integer, ArrayList> vectorBuffer = new HashMap<>(vectors);
+
         buff.writeInt(vectors.size());
-        for(int i = 0; i < vectors.size(); i++) {
-            buff.writeFloat((float) vectors.get(i).get(0));
-            buff.writeFloat((float) vectors.get(i).get(1));
-            buff.writeFloat((float) vectors.get(i).get(2));
+
+        for(Map.Entry<Integer, ArrayList> entry : vectorBuffer.entrySet()) {
+            buff.writeInt(entry.getKey());
+            buff.writeFloat((float) entry.getValue().get(0));
+            buff.writeFloat((float) entry.getValue().get(1));
+            buff.writeFloat((float) entry.getValue().get(2));
         }
     }
 
@@ -70,9 +123,9 @@ public abstract class CustomShape extends WidgetGLWorld implements ICustomShape 
 
         this.gl_strips = buff.readBoolean();
 
-        vectors = new ArrayList<ArrayList>();
+        vectors = new HashMap<>();
         for(int i = 0, vectorCount = buff.readInt(); i < vectorCount; i++) {
-            this.addVertex(buff.readFloat(), buff.readFloat(), buff.readFloat());
+            setVertex(buff.readInt(), buff.readFloat(), buff.readFloat(), buff.readFloat());
         }
     }
 
@@ -86,7 +139,9 @@ public abstract class CustomShape extends WidgetGLWorld implements ICustomShape 
     public class RenderableCustom extends RenderableGLWidget{
         @Override
         public void render(EntityPlayer player, Vec3d renderOffset, long conditionStates) {
-            if(vectors.size() <3) return;
+            syncCache();
+
+            if(vectorsCache.size() <3) return;
 
             this.preRender(conditionStates);
             this.applyModifiers(conditionStates);
@@ -97,15 +152,14 @@ public abstract class CustomShape extends WidgetGLWorld implements ICustomShape 
 
             if(gl_strips) {
                 GlStateManager.glBegin(GL11.GL_TRIANGLE_STRIP);
-                for(int i=0; i < vectors.size(); i++)
-                    GlStateManager.glVertex3f((float) vectors.get(i).get(0), (float) vectors.get(i).get(1), (float) vectors.get(i).get(2));
+                for(ArrayList vector : vectorsCache.values())
+                    GlStateManager.glVertex3f((float) vector.get(0), (float) vector.get(1), (float) vector.get(2));
             }
             else{
                 GL11.glBegin(GL11.GL_TRIANGLES);
-                for(int i=3; i <= vectors.size(); i+=3) {
-                    GlStateManager.glVertex3f((float) vectors.get(i-3).get(0), (float) vectors.get(i-3).get(1), (float) vectors.get(i-3).get(2));
-                    GlStateManager.glVertex3f((float) vectors.get(i-2).get(0), (float) vectors.get(i-2).get(1), (float) vectors.get(i-2).get(2));
-                    GlStateManager.glVertex3f((float) vectors.get(i-1).get(0), (float) vectors.get(i-1).get(1), (float) vectors.get(i-1).get(2));
+                for(ArrayList<ArrayList> tri : triangleCache) {
+                    for(ArrayList vector : tri)
+                        GlStateManager.glVertex3f((float) vector.get(0), (float) vector.get(1), (float) vector.get(2));
                 }
             }
 
