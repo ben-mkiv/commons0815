@@ -1,4 +1,4 @@
-package ben_mkiv.rendertoolkit.client.thermalvision;
+package ben_mkiv.rendertoolkit.client.shaders;
 
 /**
  * This class was created by <Vazkii>. It's distributed as
@@ -10,11 +10,12 @@ package ben_mkiv.rendertoolkit.client.thermalvision;
  *
  * File Created @ [Apr 9, 2014, 11:20:26 PM (GMT)]
  *
- * this file is a modified version of the botania shader helper class, thanks to vazkii
+ * this file is a modified version of the botania shader helper class which was based on the LWJGL Shader Tutorial, thanks to vazkii
  * mostly stripped of botania content
  */
 
 
+import ben_mkiv.rendertoolkit.client.thermalvision.ShaderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -25,9 +26,12 @@ import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public final class VazkiiShaderHelper {
@@ -35,7 +39,19 @@ public final class VazkiiShaderHelper {
     private static final int VERT = ARBVertexShader.GL_VERTEX_SHADER_ARB;
     private static final int FRAG = ARBFragmentShader.GL_FRAGMENT_SHADER_ARB;
 
-    static int thermalColorShader = 0;
+    static HashSet<ShaderTemplate> shaders = new HashSet<>();
+
+    static class ShaderTemplate {
+        public String vertexShader;
+        public String fragmentShader;
+        public int index;
+
+        public ShaderTemplate(String vertexShaderLocation, String fragmentShaderLocation, ShaderCallback callback){
+            vertexShader = vertexShaderLocation;
+            fragmentShader = fragmentShaderLocation;
+            callback.call(createProgram(vertexShaderLocation, fragmentShaderLocation));
+        }
+    }
 
     @FunctionalInterface
     public interface ShaderCallback {
@@ -44,25 +60,30 @@ public final class VazkiiShaderHelper {
 
     private static boolean lighting;
 
-    static void initShaders() {
+    public static int getShaderIndex(@Nonnull String vertexShaderLocation, @Nonnull String fragmentShaderLocation){
+        for(ShaderTemplate shader : shaders) {
+            if (shader.fragmentShader.equals(fragmentShaderLocation) && shader.vertexShader.equals(vertexShaderLocation))
+                return shader.index;
+        }
+
+        return -1;
+    }
+
+    public static void initShader(@Nonnull String vertexShaderLocation, @Nonnull String fragmentShaderLocation, ShaderCallback shaderInitCallback) {
+        if(getShaderIndex(vertexShaderLocation, fragmentShaderLocation) != -1)
+            return;
+
         if (Minecraft.getMinecraft().getResourceManager() instanceof SimpleReloadableResourceManager) {
             ((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(manager -> {
-                if(thermalColorShader != 0)
-                    ARBShaderObjects.glDeleteObjectARB(thermalColorShader); thermalColorShader = 0;
-
-                loadShaders();
+                if(useShaders()) {
+                    shaders.add(new ShaderTemplate(vertexShaderLocation, fragmentShaderLocation, shaderInitCallback));
+                }
             });
         }
     }
 
-    private static void loadShaders() {
-        if(!useShaders())
-            return;
 
-        thermalColorShader = createProgram(null, "/assets/rendertoolkit/shaders/program/thermal_color.fsh");
-    }
-
-    static void useShader(int shader, ShaderCallback callback) {
+    public static void useShader(int shader, ShaderCallback callback) {
         if(!useShaders() || shader == 0)
             return;
 
@@ -75,28 +96,28 @@ public final class VazkiiShaderHelper {
             callback.call(shader);
     }
 
-    static void releaseShader() {
+    public static void releaseShader() {
         if(lighting)
             GlStateManager.enableLighting();
 
         ARBShaderObjects.glUseProgramObjectARB(0);
     }
 
-    private static boolean useShaders() {
+    public static boolean useShaders() {
         return OpenGlHelper.shadersSupported; // && !renderToolkit.Optifine;
     }
 
 
-    private static int createProgram(String vert, String frag) {
+    public static int createProgram(String vert, String frag) {
         int program = ARBShaderObjects.glCreateProgramObjectARB();
 
         if(program == 0)
             return 0;
 
-        if(vert != null) {
+        if(!vert.equals("")) {
             ARBShaderObjects.glAttachObjectARB(program, createShader(vert, VERT));
         }
-        if(frag != null) {
+        if(!frag.equals("")) {
             ARBShaderObjects.glAttachObjectARB(program, createShader(frag, FRAG));
         }
 

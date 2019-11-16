@@ -1,6 +1,7 @@
 package ben_mkiv.rendertoolkit.client.thermalvision;
 
 import ben_mkiv.rendertoolkit.client.OptifineHelper;
+import ben_mkiv.rendertoolkit.client.shaders.VazkiiShaderHelper;
 import ben_mkiv.rendertoolkit.renderToolkit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -16,9 +17,10 @@ import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 
 public class ThermalEntityRender {
+    int thermalColorShader = -1;
 
     ThermalEntityRender(){
-        VazkiiShaderHelper.initShaders();
+        VazkiiShaderHelper.initShader("", "/assets/rendertoolkit/shaders/program/thermal_color.fsh", shaderIndex ->  { thermalColorShader = shaderIndex; });
     }
 
     private static double currentDistance = 0;
@@ -96,7 +98,7 @@ public class ThermalEntityRender {
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         // set thermalcolor rendershader
-        VazkiiShaderHelper.useShader(VazkiiShaderHelper.thermalColorShader, callback);
+        VazkiiShaderHelper.useShader(thermalColorShader, callback);
 
         // bind to entity framebuffer
         ShaderHelper.thermalEntityRendererBlur.getShaderGroup().getFramebufferRaw("in").bindFramebuffer(true);

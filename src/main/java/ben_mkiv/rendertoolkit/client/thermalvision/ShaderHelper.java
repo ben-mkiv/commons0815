@@ -18,8 +18,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ShaderHelper {
     private static boolean isActive = false;
 
-    private static ResourceLocation resourceLocationShaderOverlay = new ResourceLocation(renderToolkit.MODID, "src/optifine_dummy/java/net/optifine/shaders/post/thermal_overlay.json");
-    private static ResourceLocation resourceLocationShaderBlur = new ResourceLocation(renderToolkit.MODID, "src/optifine_dummy/java/net/optifine/shaders/post/thermal_blur.json");
+    private static ResourceLocation resourceLocationShaderOverlay = new ResourceLocation(renderToolkit.MODID, "shaders/post/thermal_overlay.json");
+    private static ResourceLocation resourceLocationShaderBlur = new ResourceLocation(renderToolkit.MODID, "shaders/post/thermal_blur.json");
 
     private static ScaledResolution framebufferResolution;
 
