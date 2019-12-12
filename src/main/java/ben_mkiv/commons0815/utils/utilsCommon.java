@@ -80,10 +80,10 @@ public class utilsCommon {
 	}
 
 	// modClazz was UrbanMechs.class
-	public static ArrayList<String> readResourceLocation(Class modClazz, String asset){
+	public static ArrayList<String> readResourceLocation(Class modClazz, String location){
 		InputStream is = null;
 		try {
-			is = modClazz.getClassLoader().getResourceAsStream("assets/urbanmechs" + asset);
+			is = modClazz.getClassLoader().getResourceAsStream(location);
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8));
 			final ArrayList<String> lines = new ArrayList<>();
 			String line;

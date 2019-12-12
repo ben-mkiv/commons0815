@@ -70,7 +70,7 @@ public class ShaderHelper {
             resetFramebuffers();
         }
 
-        ThermalEntityRender.fastRenderEnabled|=!renderToolkit.Optifine || OptifineHelper.isFastRenderEnabled();
+        ThermalEntityRender.fastRenderEnabled &= !renderToolkit.Optifine || OptifineHelper.isFastRenderEnabled();
 
         if(!ThermalEntityRender.fastRenderEnabled) {
             // apply color overlay shader
