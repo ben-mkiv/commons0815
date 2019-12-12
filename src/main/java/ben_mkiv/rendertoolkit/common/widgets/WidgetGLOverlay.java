@@ -36,6 +36,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 
 	boolean isThroughVisibility = false;
 	private boolean isLookingAtEnable = false;
+	public boolean cullFaces = true;
 
 	public boolean faceWidgetToPlayer = false;
 
@@ -59,6 +60,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 		buff.writeInt(valign.ordinal());
 		buff.writeInt(halign.ordinal());
 		buff.writeBoolean(isLookingAtEnable);
+		buff.writeBoolean(cullFaces);
 	}
 	
 	public void readData(ByteBuf buff) {
@@ -69,6 +71,7 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 		valign = VAlignment.values()[buff.readInt()];
 		halign = HAlignment.values()[buff.readInt()];
 		isLookingAtEnable = buff.readBoolean();
+		cullFaces = buff.readBoolean();
 	}
 
 	protected void writeDataSIZE(ByteBuf buff) {
@@ -218,6 +221,10 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 			age++;
 			this.setRenderFlags();
 			if(age % 50 == 0) updateRenderPosition(conditionStates);
+
+			if(!cullFaces)
+				GlStateManager.disableCull();
+
 			return WidgetModifierList.getCurrentColor(conditionStates, 0);
 		}
 
@@ -295,7 +302,10 @@ public abstract class WidgetGLOverlay extends Widget implements IResizable, IPri
 			return WidgetModifierList.getCurrentColorFloat(conditionStates, index);
 		}
 
-		public void postRender(){}
+		public void postRender(){
+			if(!cullFaces)
+				GlStateManager.enableCull();
+		}
 
 
 		@Override
