@@ -3,6 +3,7 @@ package ben_mkiv.rendertoolkit.common.widgets.component.common;
 import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.RenderType;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetGLWorld;
+import ben_mkiv.rendertoolkit.common.widgets.component.face.Text2D;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IItem;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -26,9 +27,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
+import static ben_mkiv.rendertoolkit.surface.ClientSurface.vec3d000;
+
 public abstract class ItemIcon extends WidgetGLWorld implements IItem {
     private ItemStack itmStack = ItemStack.EMPTY;
     private IBakedModel ibakedmodel = null;
+
+    boolean renderFailed = false;
+
     @Override
     public void writeData(ByteBuf buff) {
         super.writeData(buff);
@@ -114,15 +120,19 @@ public abstract class ItemIcon extends WidgetGLWorld implements IItem {
             BufferBuilder vertexbuffer = tessellator.getBuffer();
             vertexbuffer.begin(7, DefaultVertexFormats.ITEM);
 
-            for(EnumFacing facing : EnumFacing.values())
-                renderQuads(vertexbuffer, ibakedmodel.getQuads(null, facing, 0L), alphaColor);
+            try {
+                for (EnumFacing facing : EnumFacing.values())
+                    renderQuads(vertexbuffer, ibakedmodel.getQuads(null, facing, 0L), alphaColor);
 
-            renderQuads(vertexbuffer, ibakedmodel.getQuads(null, null, 0L), alphaColor);
+                renderQuads(vertexbuffer, ibakedmodel.getQuads(null, null, 0L), alphaColor);
+            } catch(Exception ex){
+                // some items (only noticed with botania:specialflower so far) wont return valid data so we have to catch render issues -.-
+            }
+
             tessellator.draw();
-
+            this.postRender();
 
             //Minecraft.getMinecraft().fontRenderer.drawString("meow", 0, 0, 0xFFFFFF);
-            this.postRender();
         }
 
         private void applyAlignments(){
