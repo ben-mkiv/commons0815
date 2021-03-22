@@ -121,9 +121,13 @@ public abstract class OBJModelOC extends WidgetGLWorld implements IOBJModel {
             this.postRender();
         }
 
-        public void renderList(List<Face> faces, int color){
-            for (Face f : faces) for (int i = 0; i < f.getVertexes().length; i++) {
-                buffer.addVertexData(f.getVertexes()[i].setColor((color)).setAlpha((color >> 24)).getVertexData(malisisVertexFormat, null));
+        public void renderList(List<Face> faces, int color) {
+            for (Face f : faces)
+                for (int i = 0; i < f.getVertexes().length; i++) {
+                    buffer.addVertexData(f.getVertexes()[i].setColor((color)).setAlpha((color >> 24)).getVertexData(malisisVertexFormat, null));
+
+                }
+        }
         public void readPolylineList(List<PolyLine> lines, int r, int g, int b, int a) {
             for (PolyLine line : lines) {
                 Vertex[] vertexes = line.getVertexes();
