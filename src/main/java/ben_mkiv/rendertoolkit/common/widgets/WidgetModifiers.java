@@ -113,7 +113,7 @@ public class WidgetModifiers {
 				}
 				else {
 					Object[] color = this.modifiers.get(i).getValues();
-					return new float[]{ (float) color[0], (float) color[1], (float) color[2], (float) color[3] };
+					return new float[]{ Math.max(0, Math.min((float) color[0], 1)), Math.max(0, Math.min((float) color[1], 1)), Math.max(0, Math.min((float) color[2], 1)), Math.max(0, Math.min((float) color[3], 1)) };
 				}
 			}
 		}
@@ -123,7 +123,7 @@ public class WidgetModifiers {
 	public float[] getCurrentScaleFloat(long conditionStates){
 		float scaleX = 1, scaleY = 1, scaleZ = 1;
 		for(int i=0; i < this.modifiers.size(); i++){
-			if(this.modifiers.get(i).getType() == WidgetModifier.WidgetModifierType.SCALE && this.modifiers.get(i).shouldApplyModifier(conditionStates) == true){
+			if(this.modifiers.get(i).getType() == WidgetModifier.WidgetModifierType.SCALE && this.modifiers.get(i).shouldApplyModifier(conditionStates)){
 				Object[] scale = this.modifiers.get(i).getValues();
 				scaleX *= (float) scale[0];
 				scaleY *= (float) scale[1];
@@ -186,7 +186,7 @@ public class WidgetModifiers {
 	}
 		
 	public void readData(ByteBuf buff){
-		ArrayList<WidgetModifier> modifiersNew = new ArrayList<WidgetModifier>();
+		ArrayList<WidgetModifier> modifiersNew = new ArrayList<>();
 		for(int i = 0, modifierCount = buff.readInt(); i < modifierCount; i++){
 			switch(WidgetModifier.WidgetModifierType.values()[buff.readShort()]){
 				case TRANSLATE: modifiersNew.add(new WidgetModifierTranslate(0F, 0F, 0F)); break;

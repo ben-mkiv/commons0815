@@ -26,8 +26,9 @@ public class utilsClient {
     }
 
     public static Entity getFocusedEntity(){
-        EntityPlayer player = Minecraft.getMinecraft().player;
-        return player.isSneaking() ? player : Minecraft.getMinecraft().objectMouseOver.entityHit;
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.player;
+        return player.isSneaking() ? player : (mc.objectMouseOver != null ? mc.objectMouseOver.entityHit : null);
     }
 
     public static TileEntity getFocusedTileEntity() {

@@ -121,8 +121,12 @@ public class utilsCommon {
 		return output;
 	}
 
+	public static float clampFloat(float val, float min, float max){
+		return Math.max(min, Math.min(val, max));
+	}
+
 	public static int getIntFromColor(float red, float green, float blue, float alpha){
-	    return new Color(red, green, blue, alpha).getRGB();
+		return new Color(clampFloat(red, 0, 1), clampFloat(green, 0, 1), clampFloat(blue, 0, 1), clampFloat(alpha, 0, 1)).getRGB();
 	}
 
 	public static int getIntFromColor(float color[], float alpha){
