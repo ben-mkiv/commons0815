@@ -4,6 +4,8 @@ import ben_mkiv.rendertoolkit.common.widgets.IRenderableWidget;
 import ben_mkiv.rendertoolkit.common.widgets.RenderType;
 import ben_mkiv.rendertoolkit.common.widgets.WidgetGLWorld;
 import ben_mkiv.rendertoolkit.common.widgets.component.wavefrontObj.Face;
+import ben_mkiv.rendertoolkit.common.widgets.component.wavefrontObj.PolyLine;
+import ben_mkiv.rendertoolkit.common.widgets.component.wavefrontObj.Vertex;
 import ben_mkiv.rendertoolkit.common.widgets.component.wavefrontObj.objParser;
 import ben_mkiv.rendertoolkit.common.widgets.core.attribute.IOBJModel;
 import com.google.common.base.Charsets;
@@ -11,6 +13,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,6 +22,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.util.List;
 
 public abstract class OBJModelOC extends WidgetGLWorld implements IOBJModel {
@@ -103,12 +107,32 @@ public abstract class OBJModelOC extends WidgetGLWorld implements IOBJModel {
                 TESR.draw();
             }
 
+            int r = (color >> 16) & 0xFF;
+            int g = (color >> 8) & 0xFF;
+            int b = color & 0xFF;
+            int a = (color >> 24) & 0xff;
+
+            if (objFile.lines.size() > 0) {
+                buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+                readPolylineList(objFile.lines, r, g, b, a);
+                TESR.draw();
+            }
+
             this.postRender();
         }
 
         public void renderList(List<Face> faces, int color){
             for (Face f : faces) for (int i = 0; i < f.getVertexes().length; i++) {
                 buffer.addVertexData(f.getVertexes()[i].setColor((color)).setAlpha((color >> 24)).getVertexData(malisisVertexFormat, null));
+        public void readPolylineList(List<PolyLine> lines, int r, int g, int b, int a) {
+            for (PolyLine line : lines) {
+                Vertex[] vertexes = line.getVertexes();
+                for (int i = 0; i < vertexes.length - 1; i++) {
+                    Vertex v1 = vertexes[i];
+                    Vertex v2 = vertexes[i + 1];
+                    buffer.pos(v1.getX(), v1.getY(), v1.getZ()).color(r, g, b, a).endVertex();
+                    buffer.pos(v2.getX(), v2.getY(), v2.getZ()).color(r, g, b, a).endVertex();
+                }
             }
         }
 
