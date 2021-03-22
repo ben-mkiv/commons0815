@@ -50,6 +50,8 @@ public class objParser
     protected static Pattern linePattern = Pattern.compile("^(?<type>.*?) (?<data>.*)$");
     /** Pattern for face data. */
     protected static Pattern facePattern = Pattern.compile("(?<v>\\d+)(/(?<t>\\d+)?(/(?<n>\\d+))?)?");
+    /** Pattern for polyline data. */
+    protected static Pattern polylinePattern = Pattern.compile("(?<v>\\d+)");
     /** Matcher object. */
     protected Matcher matcher;
     /** Current line being parsed. */
@@ -66,6 +68,7 @@ public class objParser
 
     public List<Face> facesTri = new ArrayList<>();
     public List<Face> facesQuad = new ArrayList<>();
+    public List<PolyLine> lines = new ArrayList<>();
 
     public objParser(String objData){
         load(objData);
@@ -108,6 +111,10 @@ public class objParser
                         case "g":
                         case "o":
                             addShape(data);
+                            break;
+
+                        case "l":
+                            addLine(data);
                             break;
 
                         default:
@@ -287,6 +294,33 @@ public class objParser
 
         if (data != "")
             currentShape = data.indexOf('_') != -1 ? data.substring(0, data.indexOf('_')) : data;
+    }
+
+    private void addLine(String data)
+    {
+        Matcher matcher = polylinePattern.matcher(data);
+
+        List<Vertex> lineVertex = new ArrayList<>();
+        String strV;
+        Vertex vertex;
+        int v = 0;
+
+        while (matcher.find())
+        {
+            strV = matcher.group("v");
+
+            v = Integer.parseInt(strV);
+            vertex = vertexes.get(v > 0 ? v - 1 : vertexes.size() - v - 1);
+
+            if (vertex != null)
+            {
+                lineVertex.add(new Vertex(vertex));
+            }
+            else {
+                Logger.getLogger(renderToolkit.MODID).info("[ObjFileImporter] Wrong vertex reference "+lineNumber+" for face at line "+currentLine);
+            }
+        }
+        lines.add(new PolyLine(lineVertex));
     }
 
     /**
